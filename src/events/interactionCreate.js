@@ -1,0 +1,101 @@
+import { AutocompleteInteraction, Events } from 'discord.js';
+import { globals } from '../globals.js'
+
+export const event = {
+    name: Events.InteractionCreate,
+    async execute(interaction){
+		// Check interaction type
+        if (interaction.isChatInputCommand()){
+			const command = interaction.client.commands.get(interaction.commandName);
+
+			if (!command) {
+				console.error(`No command matching ${interaction.commandName} was found.`);
+				return;
+			}
+
+			try {
+				await command.execute(interaction);
+			} catch (error) {
+				console.error(`Error executing ${interaction.commandName}`);
+				console.error(error);
+			}
+		} else if (interaction.isButton()) {
+
+			const buttonData = interaction.customId.split(globals.separator);
+
+			const button = interaction.client.buttons.get(buttonData[0]);
+
+			if(!button) console.error(`No button matching ${interaction.buttonData[0]} was found.`);
+
+			try {
+				await button.execute(interaction, buttonData);
+			} catch(error) {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(error);
+			}
+		} else if (interaction.isAutocomplete()) {
+
+			const autocomplete = interaction.client.autocompletes.get(interaction.commandName);
+
+			if(!autocomplete) console.error(`No autocomplete matching ${interaction.commandName} was found.`);
+
+			try {
+				await autocomplete.execute(interaction);
+			} catch(error) {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(error);
+			}
+		} else if(interaction.isModalSubmit()) {
+
+			const modalData = interaction.customId.split(globals.separator);
+
+			const modal = interaction.client.modals.get(modalData[0]);
+
+			if(!modal) console.error(`No modal matching ${interaction.modalData[0]} was found.`);
+
+			try {
+				await modal.execute(interaction, modalData);
+			} catch(error) {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(error);
+			}
+		} else if(interaction.isUserContextMenuCommand()) {
+			const userContextMenu = interaction.client.userContextMenus.get(interaction.commandName);
+
+			if (!userContextMenu) {
+				console.error(`No userContextMenu matching ${interaction.commandName} was found.`);
+				return;
+			}
+
+			try {
+				await userContextMenu.execute(interaction);
+			} catch (error) {
+				console.error(`Error executing ${interaction.commandName}`);
+				console.error(error);
+			}
+		} else if(interaction.isMessageContextMenuCommand()) {
+			const messageContextMenu = interaction.client.messageContextMenus.get(interaction.commandName);
+
+			if (!messageContextMenu) {
+				console.error(`No messageContextMenu matching ${interaction.commandName} was found.`);
+				return;
+			}
+
+			try {
+				await messageContextMenu.execute(interaction);
+			} catch (error) {
+				console.error(`Error executing ${interaction.commandName}`);
+				console.error(error);
+			}
+		} else {
+			interaction.reply({
+				content: `I don't know what you did, but this message isn't supposed to be shown`,
+				ephemeral: true
+			});
+
+			console.error(interaction);
+
+			return;
+		}
+    }
+}

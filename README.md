@@ -8,4 +8,4 @@ Everybody can copy it
 
 ## Other branches
 
-Holds a bot code which is deployed or not
+Contains an unstable version of several bots
