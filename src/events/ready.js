@@ -7,7 +7,7 @@ export const event = {
     async execute(client){
         console.log(`Ready! Logged in as ${client.user.tag}`);
 
-        client.user.setActivity("Showing examples");
+        client.user.setActivity("#SCAWIN");
         client.user.setStatus("online");
     }
 }
