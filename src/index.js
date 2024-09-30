@@ -11,7 +11,7 @@ const client = new Client({
 
 // Create commands collection
 client.commands = new Collection();
-const commands = fs.readdirSync("./src/commands").filter(file => file.endsWith(".js"));
+const commands = (fs.existsSync(`./src/commands`)) ? fs.readdirSync(`./src/commands`).filter(file => file.endsWith(`.js`)) : [];
 for(let command of commands){
     const commandFile = await import(`./commands/${command}`);
     client.commands.set(commandFile.command.data.name, commandFile.command);
@@ -19,7 +19,7 @@ for(let command of commands){
 
 // Create user context menus collection
 client.userContextMenus = new Collection();
-const userContextMenus = fs.readdirSync("./src/userContextMenus").filter(file => file.endsWith(".js"));
+const userContextMenus = (fs.existsSync(`./src/userContextMenus`)) ? fs.readdirSync(`./src/userContextMenus`).filter(file => file.endsWith(`.js`)) : [];
 for(let userContextMenu of userContextMenus){
     const userContextMenuFile = await import(`./userContextMenus/${userContextMenu}`);
     client.userContextMenus.set(userContextMenuFile.userContextMenu.data.name, userContextMenuFile.userContextMenu);
@@ -27,7 +27,7 @@ for(let userContextMenu of userContextMenus){
 
 // Create message context menus collection
 client.messageContextMenus = new Collection();
-const messageContextMenus = fs.readdirSync("./src/messageContextMenus").filter(file => file.endsWith(".js"));
+const messageContextMenus = (fs.existsSync(`./src/messageContextMenus`)) ? fs.readdirSync(`./src/messageContextMenus`).filter(file => file.endsWith(`.js`)) : [];
 for(let messageContextMenu of messageContextMenus){
     const messageContextMenuFile = await import(`./messageContextMenus/${messageContextMenu}`);
     client.messageContextMenus.set(messageContextMenuFile.messageContextMenu.data.name, messageContextMenuFile.messageContextMenu);
@@ -35,7 +35,7 @@ for(let messageContextMenu of messageContextMenus){
 
 // Create buttons collection
 client.buttons = new Collection();
-const buttons = fs.readdirSync("./src/buttons").filter(file => file.endsWith(".js"));
+const buttons = (fs.existsSync(`./src/buttons`)) ? fs.readdirSync(`./src/buttons`).filter(file => file.endsWith(`.js`)) : [];
 for(let button of buttons){
     const buttonFile = await import(`./buttons/${button}`);
     client.buttons.set(button.split(".")[0], buttonFile.button);
@@ -43,7 +43,7 @@ for(let button of buttons){
 
 // Create modals collection
 client.modals = new Collection();
-const modals = fs.readdirSync("./src/modals").filter(file => file.endsWith(".js"));
+const modals = (fs.existsSync(`./src/modals`)) ? fs.readdirSync(`./src/modals`).filter(file => file.endsWith(`.js`)) : [];
 for(let modal of modals){
     const modalFile = await import(`./modals/${modal}`);
     client.modals.set(modal.split(".")[0], modalFile.modal);
@@ -51,7 +51,7 @@ for(let modal of modals){
 
 // Create autocompletes collection
 client.autocompletes = new Collection();
-const autocompletes = fs.readdirSync("./src/autocompletes").filter(file => file.endsWith(".js"));
+const autocompletes = (fs.existsSync(`./src/autcompletes`)) ? fs.readdirSync(`./src/autcompletes`).filter(file => file.endsWith(`.js`)) : [];
 for(let autocomplete of autocompletes){
     const autocompleteFile = await import(`./autocompletes/${autocomplete}`);
     client.autocompletes.set(autocomplete.split(".")[0], autocompleteFile.autocomplete);
