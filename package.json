@@ -12,7 +12,10 @@
     "d": "node --env-file .env ./src/deploy-commands.js"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.56",
     "discord.js": "^14.16.3",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "puppeteer": "^23.4.1",
+    "twisted": "^1.61.2"
   }
 }
