@@ -165,7 +165,7 @@ export const command = {
 
                             // Create the button
                             const button = new ButtonBuilder()
-                            .setCustomId(`match${globals.separator}${amount}`)
+                            .setCustomId(`matchH${globals.separator}${amount}`)
                             .setLabel(`Horaire ${amount}`)
                             .setStyle(ButtonStyle.Success);
 
