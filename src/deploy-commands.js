@@ -6,9 +6,10 @@ refresh();
 // Deploy commands
 async function refresh(){
     const commands = [];
-    const commandFiles = fs.readdirSync(`./src/commands`).filter(file => file.endsWith(`.js`));
-    const userContextMenuFiles = fs.readdirSync(`./src/userContextMenus`).filter(file => file.endsWith(`.js`));
-    const messageContextMenuFiles = fs.readdirSync(`./src/messageContextMenus`).filter(file => file.endsWith(`.js`));
+    
+    const commandFiles = (fs.existsSync(`./src/commands`)) ? fs.readdirSync(`./src/commands`).filter(file => file.endsWith(`.js`)) : [];
+    const userContextMenuFiles = (fs.existsSync(`./src/userContextMenus`)) ? fs.readdirSync(`./src/userContextMenus`).filter(file => file.endsWith(`.js`)) : [];
+    const messageContextMenuFiles = (fs.existsSync(`./src/messageContextMenus`)) ? fs.readdirSync(`./src/messageContextMenus`).filter(file => file.endsWith(`.js`)) : [];
 
     for(const file of commandFiles){
         const command = await import(`./commands/${file}`);
