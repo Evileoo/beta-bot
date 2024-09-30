@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, Events } from 'discord.js';
+import { Events } from 'discord.js';
 import { globals } from '../globals.js'
 
 export const event = {
