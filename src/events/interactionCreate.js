@@ -33,6 +33,22 @@ export const event = {
 				console.error(`Error executing ${interaction.customId}`);
 				console.error(error);
 			}
+		} else if (interaction.isStringSelectMenu()) {
+
+			console.log(interaction);
+
+			const selectMenuData = interaction.customId.split(globals.separator);
+
+			const selectMenu = interaction.client.selectMenus.get(selectMenuData[0]);
+
+			if(!selectMenu) console.error(`No select menu matching ${selectMenuData[0]} was found.`);
+
+			try {
+				await selectMenu.execute(interaction, selectMenuData);
+			} catch(error) {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(error);
+			}
 		} else if (interaction.isAutocomplete()) {
 
 			const autocomplete = interaction.client.autocompletes.get(interaction.commandName);
