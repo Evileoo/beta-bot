@@ -57,6 +57,14 @@ for(let autocomplete of autocompletes){
     client.autocompletes.set(autocomplete.split(".")[0], autocompleteFile.autocomplete);
 }
 
+// Create select menus collection
+client.selectMenus = new Collection();
+const selectMenus = (fs.existsSync(`./src/selectMenus`)) ? fs.readdirSync(`./src/selectMenus`).filter(file => file.endsWith(`.js`)) : [];
+for(let selectMenu of selectMenus){
+    const selectMenuFile = await import(`./selectMenus/${selectMenu}`);
+    client.selectMenus.set(selectMenu.split(".")[0], selectMenuFile.selectMenu);
+}
+
 // Read events
 const events = fs.readdirSync("./src/events").filter(file => file.endsWith(".js"));
 for(let event of events){
