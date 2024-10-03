@@ -272,7 +272,6 @@ export const command = {
 
             ctx.fillText(`Rang:`, rankTextX, rankTextY);
 
-            console.log(rank);
             const rankIcon = await Canvas.loadImage(`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/ranked-mini-crests/${rank.toLowerCase()}.png`);
 
             const rankHeight = 50;
