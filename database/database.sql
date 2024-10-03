@@ -26,9 +26,13 @@ CREATE TABLE IF NOT EXISTS comptes (
 -- inhouse_session
 CREATE TABLE IF NOT EXISTS inhouse_session (
     id INT NOT NULL AUTO_INCREMENT COMMENT "Identifiant de la session InHouse",
-    tms TIMESTAMP NOT NULL COMMENT "Date et heure de l'in house",
+    tms VARCHAR(10) NOT NULL COMMENT "Date et heure de l'in house",
     elomin VARCHAR(20) NULL DEFAULT "UNRANKED" COMMENT "Rang minimum pour participer à l'InHouse",
     elomax VARCHAR(20) NULL DEFAULT "CHALLENGER" COMMENT "Rang maximum pour participer à l'InHouse",
+    role_limit INT COMMENT "Nombre de joueurs maximum par role",
+    guild_id VARCHAR(30) NOT NULL COMMENT "Guilde dans laquelle le message a été envoyé",
+    channel_id VARCHAR(30) NOT NULL COMMENT "Channel de la guilde dans laquelle le message a été envoyé",
+    message_id VARCHAR(30) NOT NULL COMMENT "Message d'annonce de l'inhouse",
     PRIMARY KEY (id)
 ) ENGINE=INNODB COMMENT="Sessions inhouse";
 
