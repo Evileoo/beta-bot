@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS comptes (
 CREATE TABLE IF NOT EXISTS inhouse_session (
     id INT NOT NULL AUTO_INCREMENT COMMENT "Identifiant de la session InHouse",
     tms TIMESTAMP NOT NULL COMMENT "Date et heure de l'in house",
+    elomin VARCHAR(20) NULL DEFAULT "UNRANKED" COMMENT "Rang minimum pour participer à l'InHouse",
+    elomax VARCHAR(20) NULL DEFAULT "CHALLENGER" COMMENT "Rang maximum pour participer à l'InHouse",
     PRIMARY KEY (id)
 ) ENGINE=INNODB COMMENT="Sessions inhouse";
 
