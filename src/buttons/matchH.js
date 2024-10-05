@@ -7,7 +7,7 @@ export const button = {
         let fetched = interaction.message.embeds[0].data;
 
         // If member doesn't get the pinged role
-        if(!interaction.member.roles.cache.get(fetched.description.slice(3, -1))){
+        if(!interaction.member.roles.cache.get(interaction.message.content.slice(3, -1))){
             return interaction.reply({
                 content: `Tu n'as pas le rôle ${fetched.description}, tu ne peux donc par conséquent pas participer à ce match`,
                 ephemeral: true
@@ -16,8 +16,7 @@ export const button = {
 
         // rebuild the embed
         const embed = new EmbedBuilder()
-        .setTitle(fetched.title)
-        .setDescription(fetched.description);
+        .setTitle(fetched.title);
 
         // Edit the message field
         const field = fetched.fields[buttonData[1] - 1].value.split("\n");

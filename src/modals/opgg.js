@@ -11,7 +11,6 @@ export const modal = {
         // rebuild the embed
         const embed = new EmbedBuilder()
         .setTitle(fetched.title)
-        .setDescription(fetched.description)
         .addFields(
             { name: `${fetched.fields[0].name}`, value: `${fetched.fields[0].value}` }
         );
@@ -38,7 +37,8 @@ export const modal = {
 
         await interaction.message.edit({
             embeds: [embed],
-            components: [row]
+            components: [row],
+            content: interaction.message.content
         });
 
         // Avoid "This interaction failed" message

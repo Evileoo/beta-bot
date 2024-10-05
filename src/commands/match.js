@@ -20,31 +20,31 @@ export const command = {
         .addStringOption( (option) =>
             option
             .setName("horaire1")
-            .setDescription("Proposition d'horaire n°1")
+            .setDescription("Proposition d'horaire n°1, format: 05/06/2023 15h30")
             .setRequired(true)
         )
         .addStringOption( (option) =>
             option
             .setName("horaire2")
-            .setDescription("Proposition d'horaire n°2")
+            .setDescription("Proposition d'horaire n°2, format: 05/06/2023 15h30")
             .setRequired(false)
         )
         .addStringOption( (option) =>
             option
             .setName("horaire3")
-            .setDescription("Proposition d'horaire n°3")
+            .setDescription("Proposition d'horaire n°3, format: 05/06/2023 15h30")
             .setRequired(false)
         )
         .addStringOption( (option) =>
             option
             .setName("horaire4")
-            .setDescription("Proposition d'horaire n°4")
+            .setDescription("Proposition d'horaire n°4, format: 05/06/2023 15h30")
             .setRequired(false)
         )
         .addStringOption( (option) =>
             option
             .setName("horaire5")
-            .setDescription("Proposition d'horaire n°5")
+            .setDescription("Proposition d'horaire n°5, format: 05/06/2023 15h30")
             .setRequired(false)
         )
         .addStringOption( (option) =>
@@ -78,13 +78,14 @@ export const command = {
         .addStringOption( (option) =>
             option
             .setName("horaire")
-            .setDescription("Heure du match")
+            .setDescription("Heure du match, format: 05/06/2023 15h30")
             .setRequired(true)
         )
         .addChannelOption( (option) =>
             option
             .setName("channel")
             .setDescription("Channel vocal dans lequel les joueurs ont rendez vous")
+            .addChannelTypes(ChannelType.GuildVoice)
             .setRequired(true)
         )
         .addStringOption( (option) =>
@@ -134,8 +135,6 @@ export const command = {
         switch(interaction.options.getSubcommand()){
             case "dispo":
 
-                embed.setDescription(`<@&${team.id}>`);
-
                 if(opponent) {
                     embed.setTitle(`Nouveau ${type} contre ${opponent}`);
                 } else {
@@ -179,10 +178,17 @@ export const command = {
                     }
                 }
 
-                await interaction.reply({
+                await interaction.channel.send({
                     embeds: [embed],
-                    components: [row]
+                    components: [row],
+                    content: `<@&${team.id}>`
                 });
+
+                await interaction.reply({
+                    content: `demande de disponibilités créée`,
+                    ephemeral: true
+                });
+
                 break;
             case "date":
 
@@ -207,7 +213,6 @@ export const command = {
                 const matchDateTime2 = Math.floor(new Date(dmy[2], dmy[1], dmy[0], hm[0], hm[1]).getTime() / 1000);
 
                 embed
-                .setDescription(`${team}`)
                 .addFields(
                     {name: `${type} le <t:${matchDateTime2}:f>`, value: `Présence en vocal 30 minutes avant le début demandée pour préparer la draft`}
                 )
@@ -251,11 +256,18 @@ export const command = {
 
                 embed.addFields({ name: `Évènement discord`, value: `[lien](https://discord.com/events/${interaction.guild.id}/${newEvent.id})` });
 
-                await interaction.reply({
+                await interaction.channel.send({
                     embeds: [embed],
                     components: [row],
                     content: `<@&${team.id}>`
                 });
+
+
+                await interaction.reply({
+                    content: `match créé`,
+                    ephemeral: true
+                });
+
 
                 break;
             case "draft":
