@@ -4,7 +4,6 @@ import { Constants } from 'twisted';
 import Canvas from '@napi-rs/canvas';
 import { db } from '../connections/database.js';
 import { rApi, lApi } from '../connections/lolapi.js';
-import { defineRoles } from '../functions/defineRoles.js';
 
 export const command = {
     data: new SlashCommandBuilder()
@@ -26,11 +25,6 @@ export const command = {
         .setName("supprimer")
         .setDescription("Supprime le compte lié")
     )
-    .addSubcommand( (subcommand) =>
-        subcommand
-        .setName("roles")
-        .setDescription("Gerez la priorité des roles que vous voulez jouer")
-    )
     , async execute(interaction){
 
         if(interaction.options.getSubcommand() == "enregistrer") {
@@ -41,6 +35,8 @@ export const command = {
             // Get the summoner account
             let { riotAccount, summoner } = await getLoLAccount(account[0], account[1]);
 
+            if(riotAccount == null && summoner == null) return;
+
             if(riotAccount == undefined || summoner == undefined) {
                 return await interaction.reply({
                     content: `Aucun compte trouvé avec le nom d'invocateur \`${account[0]}#${account[1]}\``,
@@ -48,11 +44,9 @@ export const command = {
                 });
             }
 
-            if(riotAccount == null && summoner == null) return;
-
             // Check if the member is already registered
-            const registered = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}' AND link_status = 'linked'`);
-            const riotAccountRegistered = await db.query(`SELECT discord_id FROM comptes WHERE riot_puuid = '${riotAccount.puuid}' AND link_status = 'linked'`);
+            const registered = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}'`);
+            const riotAccountRegistered = await db.query(`SELECT discord_id FROM comptes WHERE riot_puuid = '${riotAccount.puuid}'`);
 
             // If the riot account is already registered on this discord
             if(registered.length > 0 && registered[0].riot_puuid == riotAccount.puuid) {
@@ -67,7 +61,6 @@ export const command = {
             if(registered.length > 0) {
                 try {
                     let otherRiotAccount = (await rApi.Account.getByPUUID(registered[0].riot_puuid, Constants.RegionGroups.EUROPE)).response;
-                    let otherSummoner = (await lApi.Summoner.getByPUUID(registered[0].riot_puuid, Constants.Regions.EU_WEST)).response;
 
                     changeAccountText = `Un autre compte riot est lié à votre discord : ${otherRiotAccount.gameName}#${otherRiotAccount.tagLine}.\nSouhaitez vous changer ?\n\nPour rappel le compte lié doit être votre compte **principal**`;
 
@@ -110,7 +103,7 @@ export const command = {
             }
 
             if(ranks.length == 0) {
-                rank = "unranked";
+                rank = "UNRANKED";
             } else {
                 for(let r of ranks) {
                     if(r.queueType == "RANKED_SOLO_5x5") {
@@ -125,7 +118,7 @@ export const command = {
 
             // Create confirm button
             const confirm = new ButtonBuilder()
-            .setCustomId(`registerVerification${globals.separator}${summoner.profileIconId}`)
+            .setCustomId(`registerVerification${globals.separator}${summoner.profileIconId}${globals.separator}${account[0]}${globals.separator}${account[1]}`)
             .setLabel("Oui")
             .setStyle(ButtonStyle.Success);
 
@@ -140,14 +133,6 @@ export const command = {
 
             if(changeAccountText != "") embed.addFields({ name: `Un autre compte est lié`, value: changeAccountText });
 
-            // Update the database
-            const notFinished = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}'`);
-            if(notFinished.length > 0) {
-                await db.query(`UPDATE comptes SET riot_puuid = '${riotAccount.puuid}', link_status = 'unlinked' WHERE discord_id = '${interaction.user.id}'`);
-            } else {
-                await db.query(`INSERT INTO comptes (discord_id, riot_puuid, link_status) VALUES ('${interaction.user.id}', '${riotAccount.puuid}', 'unlinked')`);
-            }
-
             await interaction.reply({
                 embeds: [embed],
                 files: [image],
@@ -157,7 +142,7 @@ export const command = {
 
         } else if(interaction.options.getSubcommand() == "supprimer") {
 
-            const exists = await db.query(`SELECT id FROM comptes WHERE discord_id = '${interaction.user.id}'`);
+            const exists = await db.query(`SELECT NULL FROM comptes WHERE discord_id = '${interaction.user.id}'`);
 
             if(exists.length == 0) {
                 return await interaction.reply({
@@ -185,11 +170,6 @@ export const command = {
                 components: [row],
                 ephemeral: true
             });
-
-        } else if(interaction.options.getSubcommand() == "roles") {
-            
-            // Send embed
-            await defineRoles.updateEmbed(interaction, false);
 
         } else {
             return await interaction.reply({

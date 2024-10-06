@@ -1,6 +1,6 @@
-import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
+import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, IntentsBitField } from 'discord.js';
 import { globals } from '../globals.js';
-import { lApi } from '../connections/lolapi.js';
+import { rApi, lApi } from '../connections/lolapi.js';
 import { Constants } from 'twisted';
 import { db } from '../connections/database.js';
 import { defineRoles } from '../functions/defineRoles.js';
@@ -12,10 +12,10 @@ export const button = {
         const profileImageId = buttonData[1];
 
         // Check if the lol account has the right profile image
-        let account;
+        let riotAccount, account;
         try {
-            const result = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}' AND link_status <> 'linked'`);
-            account = (await lApi.Summoner.getByPUUID(result[0].riot_puuid, Constants.Regions.EU_WEST)).response;
+            riotAccount = (await rApi.Account.getByRiotId(buttonData[2], buttonData[3], Constants.RegionGroups.EUROPE)).response;
+            account = (await lApi.Summoner.getByPUUID(riotAccount.puuid, Constants.Regions.EU_WEST)).response;
         } catch(error) {
             console.error(error);
             
@@ -32,10 +32,21 @@ export const button = {
             });
         }
 
-        // Update database
-        await db.query(`UPDATE comptes SET link_status = 'linked' WHERE discord_id = '${interaction.user.id}'`);
+        const exists = await db.query(`SELECT NULL FROM comptes WHERE discord_id = '${interaction.user.id}'`);
 
-        // Build embed
-        await defineRoles.updateEmbed(interaction, false);
+        if(exists.length > 0) {
+            return await interaction.reply({
+                content: `Vous avez déjà terminé la vérification, veuillez rejeter tous les messages`,
+                ephemeral: true
+            });
+        }
+
+        // Update database
+        await db.query(`INSERT INTO comptes (discord_id, riot_puuid) VALUES ('${interaction.user.id}', '${riotAccount.puuid}')`);
+
+        await interaction.reply({
+            content: `Vos comptes ont été liés, vous pouvez rejeter tous les messages.`,
+            ephemeral: true
+        });
     }
 }
