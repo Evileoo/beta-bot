@@ -25,16 +25,17 @@ CREATE TABLE IF NOT EXISTS inhouse_session (
     guild_id VARCHAR(30) NOT NULL COMMENT "Guilde dans laquelle le message a été envoyé",
     channel_id VARCHAR(30) NOT NULL COMMENT "Channel de la guilde dans laquelle le message a été envoyé",
     message_id VARCHAR(30) NOT NULL COMMENT "Message d'annonce de l'inhouse",
+    inhouse_status VARCHAR(30) COMMENT "Etat de l'inhouse",
     PRIMARY KEY (id)
 ) ENGINE=INNODB COMMENT="Sessions inhouse";
 
 -- inhouse_partcipants
-CREATE TABLE IF NOT EXISTS inhouse_partcipants (
+CREATE TABLE IF NOT EXISTS inhouse_participants (
     discord_id VARCHAR(30) NOT NULL COMMENT "Identifiant discord du compte",
     inhouse_id INT NOT NULL COMMENT "Identifiant de la session InHouse",
-    toplaner_priority DECIMAL(1,0) NULL DEFAULT 0 COMMENT "Priorité définie pour jouer en toplane",
-    jungler_priority DECIMAL(1,0) NULL DEFAULT 0 COMMENT "Priorité définie pour jouer en jungle",
-    midlaner_priority DECIMAL(1,0) NULL DEFAULT 0 COMMENT "Priorité définie pour jouer en midlane",
-    botlaner_priority DECIMAL(1,0) NULL DEFAULT 0 COMMENT "Priorité définie pour jouer en botlane",
-    support_priority DECIMAL(1,0) NULL DEFAULT 0 COMMENT "Priorité définie pour jouer en support"
+    toplaner_priority DECIMAL(1,0) NULL DEFAULT 1 COMMENT "Priorité définie pour jouer en toplane",
+    jungler_priority DECIMAL(1,0) NULL DEFAULT 1 COMMENT "Priorité définie pour jouer en jungle",
+    midlaner_priority DECIMAL(1,0) NULL DEFAULT 1 COMMENT "Priorité définie pour jouer en midlane",
+    botlaner_priority DECIMAL(1,0) NULL DEFAULT 1 COMMENT "Priorité définie pour jouer en botlane",
+    support_priority DECIMAL(1,0) NULL DEFAULT 1 COMMENT "Priorité définie pour jouer en support"
 ) ENGINE=INNODB COMMENT="Participation à un inhouse";

@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="OKbopJxg0UrW6eN5WAiy" name="Page-1">
-        <mxGraphModel dx="1394" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1394" dy="652" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -13,7 +13,7 @@
                 <mxCell id="5" value="inhouse_session" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="400" y="340" width="200" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="id : int&lt;br&gt;tms : timestamp&lt;br&gt;elomin : varchar&lt;br&gt;elomax: varchar&lt;br&gt;guild_id: varchar&lt;br&gt;channel_id: varchar&lt;br&gt;message_id: varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="5" vertex="1">
+                <mxCell id="6" value="id : int&lt;br&gt;tms : timestamp&lt;br&gt;elomin : varchar&lt;br&gt;elomax: varchar&lt;br&gt;guild_id: varchar&lt;br&gt;channel_id: varchar&lt;br&gt;message_id: varchar&lt;br&gt;inhouse_status: varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="5" vertex="1">
                     <mxGeometry y="20" width="200" height="180" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="inhouse_participants" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">

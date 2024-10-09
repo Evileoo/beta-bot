@@ -44,7 +44,7 @@ export const button = {
         await db.query(`INSERT INTO comptes (discord_id, riot_puuid) VALUES ('${interaction.user.id}', '${riotAccount.puuid}')`);
 
         await interaction.reply({
-            content: `Vos comptes ont été liés, vous pouvez rejeter tous les messages.`,
+            content: `Vos comptes ont été liés, vous pouvez rejeter tous les messages et remettre votre ancienne image de profil.`,
             ephemeral: true
         });
     }

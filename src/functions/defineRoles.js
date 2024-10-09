@@ -5,7 +5,7 @@ import { db } from '../connections/database.js';
 
 export const defineRoles = {
     async updateEmbed(interaction, update) {
-        const newPriorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM comptes WHERE discord_id = '${interaction.user.id}'`);
+        const newPriorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM inhouse_participants WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
 
         let highPriorityMessage = "";
         let noPriorityMessage = "";
@@ -24,12 +24,12 @@ export const defineRoles = {
         // Build the embed
         const embed = new EmbedBuilder()
         .setTitle("Choix du/des roles")
-        .setDescription("Cliquez sur le bouton du role pour le mettre dans les joués ou non joués.\n\nUne fois que les roles sont comme vous le souhaitez vous pouvez fermer tous les messages.")
+        .setDescription("Cliquez sur le bouton du role pour le mettre dans les joués ou non joués.\n\nUne fois que les roles sont comme vous le souhaitez vous pouvez rejeter le message.")
         .setColor(globals.embed.colorMain)
         .setTimestamp()
         .addFields(
             { name: `Roles joués`, value: (highPriorityMessage == "") ? " " : highPriorityMessage },
-            { name: `Roles non joué`, value: (noPriorityMessage == "") ? " " : noPriorityMessage },
+            { name: `Roles non joués`, value: (noPriorityMessage == "") ? " " : noPriorityMessage },
         );
 
         const bTop = new ButtonBuilder()
@@ -76,28 +76,28 @@ export const defineRoles = {
     },
     async updateRoles(interaction, role) {
         // Get role priorities
-        const priorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM comptes WHERE discord_id = '${interaction.user.id}'`);
+        const priorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM inhouse_participants WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
 
         switch(role) {
             case "toplaner":
-                if(priorities[0].toplaner_priority == 0) await db.query(`UPDATE comptes SET toplaner_priority = ${parseInt(priorities[0].toplaner_priority) + 1} WHERE discord_id = '${interaction.user.id}'`);
-                else await db.query(`UPDATE comptes SET toplaner_priority = 0 WHERE discord_id = '${interaction.user.id}'`);
+                if(priorities[0].toplaner_priority == 0) await db.query(`UPDATE inhouse_participants SET toplaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE comptes SET toplaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             case "jungler":
-                if(priorities[0].jungler_priority == 0) await db.query(`UPDATE comptes SET jungler_priority = ${parseInt(priorities[0].jungler_priority) + 1} WHERE discord_id = '${interaction.user.id}'`);
-                else await db.query(`UPDATE comptes SET jungler_priority = 0 WHERE discord_id = '${interaction.user.id}'`);
+                if(priorities[0].jungler_priority == 0) await db.query(`UPDATE inhouse_participants SET jungler_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE inhouse_participants SET jungler_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             case "midlaner":
-                if(priorities[0].midlaner_priority == 0) await db.query(`UPDATE comptes SET midlaner_priority = ${parseInt(priorities[0].midlaner_priority) + 1} WHERE discord_id = '${interaction.user.id}'`);
-                else await db.query(`UPDATE comptes SET midlaner_priority = 0 WHERE discord_id = '${interaction.user.id}'`);
+                if(priorities[0].midlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET midlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE inhouse_participants SET midlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             case "botlaner":
-                if(priorities[0].botlaner_priority == 0) await db.query(`UPDATE comptes SET botlaner_priority = ${parseInt(priorities[0].botlaner_priority) + 1} WHERE discord_id = '${interaction.user.id}'`);
-                else await db.query(`UPDATE comptes SET botlaner_priority = 0 WHERE discord_id = '${interaction.user.id}'`);
+                if(priorities[0].botlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET botlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE inhouse_participants SET botlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             case "support":
-                if(priorities[0].support_priority == 0) await db.query(`UPDATE comptes SET support_priority = ${parseInt(priorities[0].support_priority) + 1} WHERE discord_id = '${interaction.user.id}'`);
-                else await db.query(`UPDATE comptes SET support_priority = 0 WHERE discord_id = '${interaction.user.id}'`);
+                if(priorities[0].support_priority == 0) await db.query(`UPDATE inhouse_participants SET support_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE inhouse_participants SET support_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             default :
                 return await interaction.reply({
