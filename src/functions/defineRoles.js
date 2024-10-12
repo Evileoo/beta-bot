@@ -81,7 +81,7 @@ export const defineRoles = {
         switch(role) {
             case "toplaner":
                 if(priorities[0].toplaner_priority == 0) await db.query(`UPDATE inhouse_participants SET toplaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE comptes SET toplaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+                else await db.query(`UPDATE inhouse_participants SET toplaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
             case "jungler":
                 if(priorities[0].jungler_priority == 0) await db.query(`UPDATE inhouse_participants SET jungler_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
@@ -91,7 +91,7 @@ export const defineRoles = {
                 if(priorities[0].midlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET midlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 else await db.query(`UPDATE inhouse_participants SET midlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;
-            case "botlaner":
+            case "adc":
                 if(priorities[0].botlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET botlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 else await db.query(`UPDATE inhouse_participants SET botlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
                 break;

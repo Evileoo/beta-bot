@@ -12,7 +12,7 @@ export const globals = {
             fill: ``
         },
         role: {
-            fill: ``
+            mvp: `1272492338266243158`
         },
         member: {
             fill: ``
@@ -22,5 +22,25 @@ export const globals = {
         colorMain: `#ccfffc`, // Light blue
         colorSecond: `#bbffb3`, // Light green
         colorError: `#ff0000` // Red
+    },
+    lol: {
+        rank: [
+            "IV",
+            "III",
+            "II",
+            "I"
+        ],
+        tier: [
+            "IRON",
+            "BRONZE",
+            "SILVER",
+            "GOLD",
+            "PLATINUM",
+            "EMERALD",
+            "DIAMOND",
+            "MASTER",
+            "GRANDMASTER",
+            "CHALLENGER"
+        ]
     }
 }

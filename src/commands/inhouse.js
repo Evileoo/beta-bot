@@ -1,7 +1,9 @@
 import { SlashCommandBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder } from 'discord.js';
 import { globals } from '../globals.js';
 import Canvas from '@napi-rs/canvas';
-import { db } from '../connections/database.js'
+import { db } from '../connections/database.js';
+import { lApi } from '../connections/lolapi.js';
+import { Constants } from 'twisted';
 
 export const command = {
     data: new SlashCommandBuilder()
@@ -118,6 +120,12 @@ export const command = {
         subcommand
         .setName("annuler")
         .setDescription("Annule l'inhouse en cours")
+        .addStringOption( (option) =>
+            option
+            .setName("raison")
+            .setDescription("Raison de l'annulation. Écrivez 0 pour faire une annulation sans laisser de message")
+            .setRequired(true)
+        )
     )
     .addSubcommand((subcommand) => 
         subcommand
@@ -145,6 +153,17 @@ export const command = {
         subcommand
         .setName("mvp")
         .setDescription("Définit le MVP du dernier inhouse")
+        .addUserOption( (option) =>
+            option
+            .setName("membre")
+            .setDescription("Membre du discord qui va obtenir le MVP")
+            .setRequired(true)
+        )
+    )
+    .addSubcommand((subcommand) => 
+        subcommand
+        .setName("équipes")
+        .setDescription("Génère les équipes de l'inhouse")
     )
     , async execute(interaction){
 
@@ -302,13 +321,250 @@ export const command = {
 
         } else if(interaction.options.getSubcommand() == "annuler") {
 
+            const reason = interaction.options.getString("raison");
+
+            // Check if there's an inhouse running
+            const inhouse = await db.query(`SELECT * FROM inhouse_session WHERE inhouse_status <> 'finished' ORDER BY id DESC LIMIT 1`);
+
+            if(inhouse.length == 0) {
+                return await interaction.reply({
+                    content: `Il n'y a aucun inhouse en cours`,
+                    ephemeral: true
+                });
+            }
+
+            // Find the message
+            const channel = await interaction.client.channels.fetch(inhouse[0].channel_id);
+            const message = await channel.messages.fetch(inhouse[0].message_id);
+            
+            const oldEmbed = message.embeds[0];
+
+            // Build the new embed
+            const embed = new EmbedBuilder()
+            .setTitle(`${oldEmbed.title} annulé`)
+            .setTimestamp()
+            .setColor(globals.embed.colorError);
+
+            if(reason != "0") {
+                embed.setFields({ name: `Raison`, value: reason });
+            } else {
+                embed.setDescription(`Désolé du dérangement`);
+            }
+
+            // Finish the inhouse and remove participants
+            await db.query(`UPDATE inhouse_session SET inhouse_status = 'finished' ORDER BY id DESC LIMIT 1`);
+            await db.query(`DELETE FROM inhouse_participants WHERE inhouse_id = ${inhouse[0].id}`);
+
+            // Edit the embed
+            await message.edit({
+                embeds: [embed],
+                components: []
+            });
+
+            await interaction.reply({
+                content: `inhouse annulé avec succès`,
+                ephemeral: true
+            });
+
         } else if(interaction.options.getSubcommand() == "fininscriptions") {
+
+            // Check if there's an inhouse running
+            const inhouse = await db.query(`SELECT * FROM inhouse_session WHERE inhouse_status <> 'finished' ORDER BY id DESC LIMIT 1`);
+
+            if(inhouse.length == 0) {
+                return await interaction.reply({
+                    content: `Il n'y a aucun inhouse en cours`,
+                    ephemeral: true
+                });
+            }
+
+            // Close the inhouse
+            await db.query(`UPDATE inhouse_session SET inhouse_status = 'finished' ORDER BY id DESC LIMIT 1`);
+
+            // Find the message
+            const channel = await interaction.client.channels.fetch(inhouse[0].channel_id);
+            const message = await channel.messages.fetch(inhouse[0].message_id);
+            
+            const oldEmbed = message.embeds[0];
+
+            const newEmbed = new EmbedBuilder()
+            .setTitle(oldEmbed.title)
+            .addFields(
+                { name: oldEmbed.fields[0].name, value: oldEmbed.fields[0].value, inline: true },
+                { name: oldEmbed.fields[4].name, value: oldEmbed.fields[4].value, inline: true },
+            )
+            .setColor(globals.embed.colorSecond)
+            .setTimestamp();
+
+            await message.edit({
+                embeds: [newEmbed],
+                components: []
+            });
+
+            await channel.send({
+                content: `Inscriptions à l'In House n°${inhouse[0].id} terminées !\nLa composition des équipes va arriver d'ici peu`
+            });
+
+            await interaction.reply({
+                content: `Inscriptions terminées avec succès`,
+                ephemeral: true
+            });
 
         } else if(interaction.options.getSubcommand() == "remplacer") {
 
+            // Get command data
+            const replaced = interaction.options.getUser("remplacé");
+            const replacedBy = interaction.options.getUser("remplaçant");
+
+            // Check if there's an inhouse running
+            const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
+
+            if(inhouse.length == 0) {
+                return await interaction.reply({
+                    content: `Il n'y a aucun inhouse en cours`,
+                    ephemeral: true
+                });
+            }
+
+            // Check if the replaced user is participating to this inhouse
+            const particpating = await db.query(`SELECT NULL FROM inhouse_participants WHERE discord_id = '${replaced.id}' AND inhouse_id = ${inhouse[0].id}`);
+
+            if(particpating.length == 0) {
+                return await interaction.reply({
+                    content: `Le joueur ne peut pas être remplacé, il ne participe pas à cet inhouse`,
+                    ephemeral: true
+                });
+            }
+
+            // Check if it is the same user
+            if(replaced.id == replacedBy.id) {
+                return await interaction.reply({
+                    content: `Vous ne pouvez pas remplacer un participant par lui-même`,
+                    ephemeral: true
+                });
+            }
+
+            // Replace the user
+            await db.query(`UPDATE inhouse_participants SET discord_id = '${replacedBy.id}' WHERE inhouse_id = ${inhouse[0].id} AND discord_id = '${replaced.id}'`);
+
+            await interaction.reply({
+                content: `<@${replaced.id}> a été remplacé par <@${replacedBy.id}>`,
+                ephemeral: true
+            });
+
         } else if(interaction.options.getSubcommand() == "mvp") {
 
+            const user = interaction.options.getUser("membre");
+
+            // Get the user in the guild
+            const member = await interaction.guild.members.fetch(user.id);
+
+            // Get the role
+            const role = await interaction.guild.roles.cache.get(globals.server.role.mvp);
+
+            // Check if a member has the mvp role
+            const roleOwners = await role.members.map(m => m.user.id);
+
+            if(roleOwners.length > 0) {
+                // Remove the role to owners
+                for(let ownerId of roleOwners) {
+                    const roleOwner = await interaction.guild.members.cache.find(m => m.user.id == ownerId);
+                    roleOwner.roles.remove(role);
+                }
+            }
+
+            // Give the role to the member
+            await member.roles.add(role);
+
+            await interaction.reply({
+                content: `le role <@&${role.id}> a bien été donné à <@${user.id}>`,
+                ephemeral: true
+            });
+
+        } else if(interaction.options.getSubcommand() == "équipes") {
+
+            const participants = await db.query(`SELECT c.riot_puuid, c.discord_id, p.toplaner_priority, p.jungler_priority, p.midlaner_priority, p.botlaner_priority, p.support_priority FROM inhouse_participants p, comptes c WHERE c.discord_id = p.discord_id AND p.inhouse_id = ( SELECT id FROM inhouse_session ORDER BY id DESC LIMIT 1 )`);
+            const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
+
+            //if(participants.length < 10) {
+            //    return await interaction.reply({
+            //        content: `Il faut au minimum 10 participants pour pouvoir générer les équipes`,
+            //        ephemeral: true
+            //    });
+            //}
+
+            // Define participation priority and elo of each player
+            for(let i = 0; i < participants.length; i++) {
+                const p = participants[i];
+
+                // Define priority
+                const checkPriority = await db.query(`SELECT inhouse_id FROM inhouse_participants WHERE discord_id = '${p.discord_id}' ORDER BY inhouse_id DESC LIMIT 1, 1`);
+                const inhouse = await db.query(`SELECT * from inhouse_session ORDER BY id DESC LIMIT 1`);
+
+                if(checkPriority.length == 0) participants[i].priority = 0;
+                else if(checkPriority[0].inhouse_id != parseInt(inhouse[0].id) - 1) participants[i].priority = 1;
+                else participants[i].priority = 2;
+
+                // Get elo
+                let elo;
+                try {
+                    const summoner = (await lApi.Summoner.getByPUUID(p.riot_puuid, Constants.Regions.EU_WEST)).response;
+                    let ranks = (await lApi.League.bySummoner(summoner.id, Constants.Regions.EU_WEST)).response;
+
+                    if(ranks.length == 0) {
+                        elo = 0;
+                    } else {
+                        let found = false;
+                        for(let r of ranks) {
+                            if(r.queueType == "RANKED_SOLO_5x5") {
+                                found = true;
+                                let j;
+                                for(j = 0; j < globals.lol.tier.length; j++) {
+                                    if(globals.lol.tier[j] == r.tier) {
+                                        j = j*400;
+                                        break;
+                                    }
+                                }
+
+                                let k;
+                                for(k = 0; k < globals.lol.rank.length; k++) {
+                                    if(globals.lol.rank[k] == r.rank) {
+                                        k = k*100;
+                                        break;
+                                    }
+                                }
+
+                                elo = j + k + parseInt(r.leaguePoints);
+                                break;
+                            }
+                        }
+
+                        if(!found) elo = 0;
+                    }
+                } catch(error) {
+                    console.error(error);
+
+                    return await interaction.reply({
+                        content: `Erreur lors de la récupération du rang d'un des comptes, réessayez plus tard`,
+                        ephemeral: true
+                    });
+                }
+
+                participants[i].elo = elo;
+
+                // Wait a little to avoid api call overload
+                setTimeout(() => {}, 100);
+            }
+
+            // Generate teams
+
+
         } else {
+
+            await interaction.reply({
+                content: `Commande non reconnue, merci de prévenir ${globals.developer.discord.globalName}`,
+                ephemeral: true
+            });
             
         }
     }

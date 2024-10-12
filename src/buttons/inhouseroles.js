@@ -12,20 +12,6 @@ export const button = {
         const member = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}'`);
         const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
-        const ranksOrder = [
-            "UNRANKED",
-            "IRON",
-            "BRONZE",
-            "SILVER",
-            "GOLD",
-            "PLATINUM",
-            "EMERALD",
-            "DIAMOND",
-            "MASTER",
-            "GRANDMASTER",
-            "CHALLENGER"
-        ];
-
         // Check if the member is registered in database
         if(member.length == 0) {
             return await interaction.reply({
@@ -60,7 +46,7 @@ export const button = {
                     let ok = false;
                     let check = false;
 
-                    for(let o of ranksOrder) {
+                    for(let o of globals.lol.tier) {
                         if(inhouse[0].elomin == o) check = true;
                         else if (inhouse[0].elomax == o) check = false;
                         
