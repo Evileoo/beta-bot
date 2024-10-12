@@ -8,8 +8,7 @@
     "name": "Evileoo"
   },
   "scripts": {
-    "i": "node --env-file .env ./src/index.js",
-    "d": "node --env-file .env ./src/deploy-commands.js"
+    "i": "node --env-file .env ./src/index.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.56",

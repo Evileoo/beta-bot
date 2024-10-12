@@ -1,6 +1,7 @@
 // JS imports
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
+import { deploy } from './deploy-commands.js';
 
 // Create client instance
 const client = new Client({
@@ -106,6 +107,9 @@ client.on('disconnect', () => {
 client.on('reconnecting', () => {
     console.info('Le bot se reconnecte...');
 });
+
+// refresh commands
+await deploy.refresh();
 
 // Login
 await client.login(process.env.TOKEN);
