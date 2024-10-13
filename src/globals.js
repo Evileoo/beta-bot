@@ -7,16 +7,18 @@ export const globals = {
         },
         twitter: `@Evileoo`,
     },
-    server: {
-        channel: {
-            fill: ``
+    servers: {
+        dev: {
+            channel: {
+                fill: ``
+            },
+            role: {
+                mvp: `1272492338266243158`
+            },
+            member: {
+                fill: ``
+            }
         },
-        role: {
-            mvp: `1272492338266243158`
-        },
-        member: {
-            fill: ``
-        }
     },
     embed: {
         colorMain: `#ccfffc`, // Light blue

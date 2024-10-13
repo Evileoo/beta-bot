@@ -460,7 +460,7 @@ export const command = {
             const member = await interaction.guild.members.fetch(user.id);
 
             // Get the role
-            const role = await interaction.guild.roles.cache.get(globals.server.role.mvp);
+            const role = await interaction.guild.roles.cache.get(globals.servers.dev.role.mvp);
 
             // Check if a member has the mvp role
             const roleOwners = await role.members.map(m => m.user.id);
