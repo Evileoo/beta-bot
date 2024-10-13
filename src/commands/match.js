@@ -1,6 +1,7 @@
-import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, GuildScheduledEventManager, GuildScheduledEventPrivacyLevel, GuildScheduledEventEntityType, ChannelType } from 'discord.js';
-import puppeteer from 'puppeteer';
+import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, GuildScheduledEventManager, GuildScheduledEventPrivacyLevel, GuildScheduledEventEntityType, ChannelType, AttachmentBuilder } from 'discord.js';
 import { globals } from '../globals.js';
+import { sdl } from '../functions/scrapDraftlol.js';
+import puppeteer from 'puppeteer';
 
 export const command = {
     data: new SlashCommandBuilder()
@@ -114,8 +115,8 @@ export const command = {
     )
     .addSubcommand( (subcommand) =>
         subcommand
-        .setName("draft")
-        .setDescription("Récupère le résultat d'une draft vai draftlol")
+        .setName("draftlol")
+        .setDescription("Récupère le résultat d'une draft via draftlol")
         .addStringOption( (option) =>
             option
             .setName("url")
@@ -270,33 +271,34 @@ export const command = {
 
 
                 break;
-            case "draft":
+            case "draftlol":
                 // https://draftlol.dawe.gg/NvxBNpz7
-                const url = interaction.options.getString("url");
-                const i = interaction;
 
+                const file = "draft.png";
+
+                const url = interaction.options.getString("url");
+
+                await interaction.reply({
+                    content: `Envoi en cours`,
+                    ephemeral: true
+                });
+                
                 const browser = await puppeteer.launch();
                 const page = await browser.newPage();
+                await page.setViewport({ width: 1920, height: 1080 });
 
                 await page.goto(url, { waitUntil: 'networkidle2' });
 
-                await page.waitForSelector(".roomContainer");
+                await page.screenshot({ path: file });
 
-                const draftData = await page.evaluate(() => {
-                    const bluePicks = document.querySelectorAll(".roomPickColumn blue").length;
+                const image = new AttachmentBuilder(file, { name: file });
 
-                    return bluePicks;
-                });
-
-                console.log(draftData);
-
-                await page.close();
-                await browser.close();
-
-                await i.reply({
-                    content: url,
+                await interaction.channel.send({
+                    files: [image],
                     ephemeral: true
                 });
+
+                browser.close();
 
                 break;
             default:
