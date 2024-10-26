@@ -1,9 +1,9 @@
 import { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, subtext } from 'discord.js';
-import { globals } from '../globals.js';
+import { globals } from '../../globals.js';
 import { Constants } from 'twisted';
 import Canvas from '@napi-rs/canvas';
-import { db } from '../connections/database.js';
-import { rApi, lApi } from '../connections/lolapi.js';
+import { db } from '../../connections/database.js';
+import { rApi, lApi } from '../../connections/lolapi.js';
 
 export const command = {
     data: new SlashCommandBuilder()

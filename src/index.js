@@ -1,6 +1,7 @@
 // JS imports
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
+import path from 'path';
 import { deploy } from './deploy-commands.js';
 
 // Create client instance
@@ -12,26 +13,47 @@ const client = new Client({
 
 // Create commands collection
 client.commands = new Collection();
-const commands = (fs.existsSync(`./src/commands`)) ? fs.readdirSync(`./src/commands`).filter(file => file.endsWith(`.js`)) : [];
-for(let command of commands){
-    const commandFile = await import(`./commands/${command}`);
-    client.commands.set(commandFile.command.data.name, commandFile.command);
+const commandFoldersPath = path.join("src", "commands");
+const commandFolders = (fs.existsSync(commandFoldersPath)) ? fs.readdirSync(commandFoldersPath) : [];
+
+for(let folder of commandFolders) {
+    const commandsPath = path.join(commandFoldersPath, folder);
+    const commandFiles = (fs.existsSync(commandsPath)) ? fs.readdirSync(commandsPath).filter(file => file.endsWith(".js")) : [];
+
+    for(let command of commandFiles) {
+        const commandFile = await import(`./commands/${folder}/${command}`);
+        client.commands.set(commandFile.command.data.name, commandFile.command);
+    }
 }
 
 // Create user context menus collection
 client.userContextMenus = new Collection();
-const userContextMenus = (fs.existsSync(`./src/userContextMenus`)) ? fs.readdirSync(`./src/userContextMenus`).filter(file => file.endsWith(`.js`)) : [];
-for(let userContextMenu of userContextMenus){
-    const userContextMenuFile = await import(`./userContextMenus/${userContextMenu}`);
-    client.userContextMenus.set(userContextMenuFile.userContextMenu.data.name, userContextMenuFile.userContextMenu);
+const userContextMenusFoldersPath = path.join("src", "userContextMenus");
+const userContextMenusFolders = (fs.existsSync(userContextMenusFoldersPath)) ? fs.readdirSync(userContextMenusFoldersPath) : [];
+
+for(let folder of userContextMenusFolders) {
+    const userContextMenusPath = path.join(userContextMenusFoldersPath, folder);
+    const userContextMenuFiles = (fs.existsSync(userContextMenusPath)) ? fs.readdirSync(userContextMenusPath).filter(file => file.endsWith(".js")) : [];
+
+    for(let userContextMenu of userContextMenuFiles) {
+        const userContextMenuFile = await import(`./userContextMenus/${folder}/${userContextMenu}`);
+        client.userContextMenus.set(userContextMenuFile.userContextMenu.data.name, userContextMenuFile.userContextMenu);
+    }
 }
 
 // Create message context menus collection
 client.messageContextMenus = new Collection();
-const messageContextMenus = (fs.existsSync(`./src/messageContextMenus`)) ? fs.readdirSync(`./src/messageContextMenus`).filter(file => file.endsWith(`.js`)) : [];
-for(let messageContextMenu of messageContextMenus){
-    const messageContextMenuFile = await import(`./messageContextMenus/${messageContextMenu}`);
-    client.messageContextMenus.set(messageContextMenuFile.messageContextMenu.data.name, messageContextMenuFile.messageContextMenu);
+const messageContextMenusFoldersPath = path.join("src", "messageContextMenus");
+const messageContextMenusFolders = (fs.existsSync(messageContextMenusFoldersPath)) ? fs.readdirSync(messageContextMenusFoldersPath) : [];
+
+for(let folder of messageContextMenusFolders) {
+    const messageContextMenusPath = path.join(messageContextMenusFoldersPath, folder);
+    const messageContextMenuFiles = (fs.existsSync(messageContextMenusPath)) ? fs.readdirSync(messageContextMenusPath).filter(file => file.endsWith(".js")) : [];
+
+    for(let messageContextMenu of messageContextMenuFiles) {
+        const messageContextMenuFile = await import(`./messageContextMenus/${folder}/${messageContextMenu}`);
+        client.messageContextMenus.set(messageContextMenuFile.messageContextMenu.data.name, messageContextMenuFile.messageContextMenu);
+    }
 }
 
 // Create buttons collection
@@ -109,7 +131,8 @@ client.on('reconnecting', () => {
 });
 
 // refresh commands
-await deploy.refresh();
+await deploy.refreshArena();
+await deploy.refreshCommunity();
 
 // Login
 await client.login(process.env.TOKEN);

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, GuildScheduledEventManager, GuildScheduledEventPrivacyLevel, GuildScheduledEventEntityType, ChannelType, AttachmentBuilder } from 'discord.js';
-import { globals } from '../globals.js';
-import { sdl } from '../functions/scrapDraftlol.js';
+import { globals } from '../../globals.js';
+import { sdl } from '../../functions/scrapDraftlol.js';
 import puppeteer from 'puppeteer';
 
 export const command = {
@@ -278,6 +278,11 @@ export const command = {
 
                 const url = interaction.options.getString("url");
 
+                const result = await sdl.getResults(url);
+
+                //console.log(result);
+                break;
+
                 await interaction.reply({
                     content: `Envoi en cours`,
                     ephemeral: true
@@ -299,6 +304,8 @@ export const command = {
                 });
 
                 browser.close();
+
+
 
                 break;
             default:
