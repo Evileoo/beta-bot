@@ -51,9 +51,16 @@ export const event = {
 			}
 		} else if (interaction.isAutocomplete()) {
 
-			const autocomplete = interaction.client.autocompletes.get(interaction.commandName);
+			let autocomplete;
 
-			if(!autocomplete) console.error(`No autocomplete matching ${interaction.commandName} was found.`);
+			if(interaction.commandName == "compte") {
+				if(interaction.options.getSubcommand() == "supprimer") {
+					autocomplete = interaction.client.autocompletes.get("compteListLinks");
+				}
+			} else {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(`Unkown autocomplete`);
+			}
 
 			try {
 				await autocomplete.execute(interaction);

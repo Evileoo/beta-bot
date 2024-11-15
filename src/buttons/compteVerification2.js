@@ -31,20 +31,14 @@ export const button = {
             });
         }
 
-        const exists = await db.query(`SELECT NULL FROM comptes WHERE discord_id = '${interaction.user.id}'`);
-
-        if(exists.length > 0) {
-            return await interaction.reply({
-                content: `Vous avez déjà terminé la vérification, veuillez rejeter tous les messages`,
-                ephemeral: true
-            });
-        }
-
         // Update database
-        await db.query(`INSERT INTO comptes (discord_id, riot_puuid) VALUES ('${interaction.user.id}', '${riotAccount.puuid}')`);
+        await db.query(`INSERT INTO account (discord_id, riot_puuid) VALUES ('${interaction.user.id}', '${riotAccount.puuid}')`);
 
-        await interaction.reply({
-            content: `Vos comptes ont été liés, vous pouvez rejeter tous les messages et remettre votre ancienne image de profil.`,
+        await interaction.update({
+            content: `Vos comptes ont été liés, vous pouvez remettre votre ancienne image de profil.\nPour voir vos comptes Riot liés au bot, faites la commande \`/compte liste\``,
+            embeds : [],
+            components : [],
+            files: [],
             ephemeral: true
         });
     }

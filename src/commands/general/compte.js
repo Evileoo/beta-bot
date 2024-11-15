@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder, subtext } from 'discord.js';
+import { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } from 'discord.js';
 import { globals } from '../../globals.js';
 import { Constants } from 'twisted';
 import Canvas from '@napi-rs/canvas';
@@ -11,12 +11,12 @@ export const command = {
     .setDescription("Gestion de la lisaison entre un compte lol et le bot")
     .addSubcommand( (subcommand) =>
         subcommand
-        .setName("enregistrer")
+        .setName("ajouter")
         .setDescription("Ajoute votre compte LoL principal à votre compte discord")
         .addStringOption( (option) =>
             option
-            .setName("compte")
-            .setDescription("Exemple: otpdravenL9#ff15")
+            .setName("nom")
+            .setDescription("Exemple: xXKILL3RXx rpz#Yukii")
             .setRequired(true)
         )
     )
@@ -24,13 +24,40 @@ export const command = {
         subcommand
         .setName("supprimer")
         .setDescription("Supprime le compte lié")
+        .addStringOption( (option) =>
+            option
+            .setName("nom")
+            .setDescription("Nom du compte dont vous souhaitez supprimer la liaison")
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+    )
+    .addSubcommand( (subcommand) =>
+        subcommand
+        .setName("liste")
+        .setDescription("Affiche la liste des compte liés")
+        .addUserOption( (option) =>
+            option
+            .setName("membre")
+            .setDescription("Membre dont on veut la liste des comptes liés")
+            .setRequired(false)
+        )
     )
     , async execute(interaction){
 
-        if(interaction.options.getSubcommand() == "enregistrer") {
+        if(interaction.options.getSubcommand() == "ajouter") {
 
             // Get command data
-            const account = interaction.options.getString("compte").split("#");
+            const account = interaction.options.getString("nom").split("#");
+
+            // Check if the member has too many accounts linked
+            const accountNumber = await db.query(`SELECT COUNT(*) AS "number" FROM account WHERE discord_id = '${interaction.user.id}'`);
+            if(accountNumber.number >= 20) {
+                return await interaction.reply({
+                    content: `Vous avez atteint la limite de comptes liés\nVeuillez supprimer un compte pour pouvoir en ajouter un autre`,
+                    ephemeral: true
+                });
+            }
 
             // Get the summoner account
             let { riotAccount, summoner } = await getLoLAccount(account[0], account[1]);
@@ -44,45 +71,17 @@ export const command = {
                 });
             }
 
-            // Check if the member is already registered
-            const registered = await db.query(`SELECT riot_puuid FROM comptes WHERE discord_id = '${interaction.user.id}'`);
-            const riotAccountRegistered = await db.query(`SELECT discord_id FROM comptes WHERE riot_puuid = '${riotAccount.puuid}'`);
-
-            // If the riot account is already registered on this discord
-            if(registered.length > 0 && registered[0].riot_puuid == riotAccount.puuid) {
-                return await interaction.reply({
-                    content: `Ce compte Riot est déjà synchronisé sur votre discord`,
-                    ephemeral: true
-                });
-            }
-
-            // If an other riot account is already registered to this discord
-            let changeAccountText = "";
-            if(registered.length > 0) {
-                try {
-                    let otherRiotAccount = (await rApi.Account.getByPUUID(registered[0].riot_puuid, Constants.RegionGroups.EUROPE)).response;
-
-                    changeAccountText = `Un autre compte riot est lié à votre discord : ${otherRiotAccount.gameName}#${otherRiotAccount.tagLine}.\nSouhaitez vous changer ?\n\nPour rappel le compte lié doit être votre compte **principal**`;
-
-                } catch(error) {
-                    console.error(error);
-
-                    changeAccountText = `Un autre compte riot est lié à votre discord, souhaitez vous le changer ?\n\nPour rappel le compte lié doit être votre compte **principal**`;
-                }
-            }
-
-            // If this riot account is linked to an other discord account
-            if(riotAccountRegistered.length > 0 && interaction.user.id != riotAccountRegistered[0].discord_id){
-                try {
-                    const otherDiscordAccount = await interaction.guild.members.fetch(riotAccountRegistered[0].discord_id);
-
+            // Check if the account is already linked
+            const linked = await db.query(`SELECT * FROM account WHERE riot_puuid = '${riotAccount.puuid}'`);
+            if(linked.length > 0) {
+                if(linked[0].discord_id == interaction.user.id) {
                     return await interaction.reply({
-                        content: `Ce compte riot est déjà lié à <@${riotAccountRegistered[0].discord_id}>`,
+                        content: `Ce compte Riot est déjà lié à votre compte discord`,
                         ephemeral: true
                     });
-                } catch(error) {
+                } else {
                     return await interaction.reply({
-                        content: `Ce compte riot est déjà lié à un autre compte discord n'étant plus sur le serveur`,
+                        content: `Ce compte Riot est déjà lié au compte discord de <@${linked[0].discord_id}>`,
                         ephemeral: true
                     });
                 }
@@ -118,7 +117,7 @@ export const command = {
 
             // Create confirm button
             const confirm = new ButtonBuilder()
-            .setCustomId(`registerVerification${globals.separator}${summoner.profileIconId}${globals.separator}${account[0]}${globals.separator}${account[1]}`)
+            .setCustomId(`compteVerification1${globals.separator}${summoner.profileIconId}${globals.separator}${account[0]}${globals.separator}${account[1]}`)
             .setLabel("Oui")
             .setStyle(ButtonStyle.Success);
 
@@ -131,8 +130,6 @@ export const command = {
             .setTimestamp()
             .setColor(globals.embed.colorMain);
 
-            if(changeAccountText != "") embed.addFields({ name: `Un autre compte est lié`, value: changeAccountText });
-
             await interaction.reply({
                 embeds: [embed],
                 files: [image],
@@ -142,33 +139,64 @@ export const command = {
 
         } else if(interaction.options.getSubcommand() == "supprimer") {
 
-            const exists = await db.query(`SELECT NULL FROM comptes WHERE discord_id = '${interaction.user.id}'`);
+            // Get command data
+            const account = interaction.options.getString("nom");
+
+            const exists = await db.query(`SELECT NULL FROM account WHERE riot_puuid = '${account}'`);
 
             if(exists.length == 0) {
+                if(account == "noLinks") {
+                    return await interaction.reply({
+                        content: `Vous n'avez lié aucun compte Riot à votre compte discord`,
+                        ephemeral: true
+                    });
+                } else {
+                    return await interaction.reply({
+                        content: `Veuillez sélectionner un des comptes parmi la liste`,
+                        ephemeral: true
+                    });
+                }
+            }
+
+            await db.query(`DELETE FROM account WHERE riot_puuid = '${account}'`);
+
+            await interaction.reply({
+                content: `La liaison a été supprimée`,
+                ephemeral: true
+            });
+
+        } else if(interaction.options.getSubcommand() == "liste") {
+
+            // Get command data
+            const member = (interaction.options.getUser("membre") == undefined) ? interaction.user : interaction.options.getUser("membre");
+            
+            // Get linked accounts in database
+            const linked = await db.query(`SELECT riot_puuid FROM account WHERE discord_id = '${member.id}'`);
+
+            if(linked.length == 0) {
                 return await interaction.reply({
-                    content: `Vous n'avez lié aucun compte Riot à votre compte discord`,
+                    content: `<@${member.id}> n'a lié aucun compte Riot à son compte discord`,
                     ephemeral: true
                 });
             }
 
             const embed = new EmbedBuilder()
-            .setTitle("Êtes-vous sûr de vouloir supprimer la liaision au compte riot ?")
-            .setDescription("Vos préférences de role vont être supprimés.\nSi vous souhaitez que toutes vos données soient supprimées, contactez un member du staff")
+            .setTitle(`Liste des comptes liés de ${member.globalName}`)
             .setColor(globals.embed.colorMain)
             .setTimestamp();
 
-            const button = new ButtonBuilder()
-            .setCustomId("unlink")
-            .setLabel("Supprimer la liaison")
-            .setStyle(ButtonStyle.Danger);
+            let desc = "";
 
-            const row = new ActionRowBuilder()
-            .addComponents(button);
+            for(let link of linked) {
+                const riotAccount = (await rApi.Account.getByPUUID(link.riot_puuid, Constants.RegionGroups.EUROPE)).response;
+
+                desc += `${riotAccount.gameName}#${riotAccount.tagLine}\n`;
+            }
+
+            embed.setDescription(desc);
 
             await interaction.reply({
-                embeds: [embed],
-                components: [row],
-                ephemeral: true
+                embeds: [embed]
             });
 
         } else {

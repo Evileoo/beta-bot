@@ -1,49 +1,91 @@
 <mxfile host="65bd71144e">
     <diagram id="OKbopJxg0UrW6eN5WAiy" name="Page-1">
-        <mxGraphModel dx="1394" dy="652" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2244" dy="625" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="3" value="comptes" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="80" y="40" width="200" height="200" as="geometry"/>
+                <mxCell id="13" value="account" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="120" width="200" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="discord_id : varchar&lt;br&gt;riot_puuid : varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="3" vertex="1">
+                <mxCell id="14" value="discord : varchar&lt;br&gt;riot_puuid : varchar (pk)" style="rounded=0;whiteSpace=wrap;html=1;" parent="13" vertex="1">
                     <mxGeometry y="20" width="200" height="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="inhouse_session" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="400" y="340" width="200" height="200" as="geometry"/>
+                <mxCell id="18" value="inhouse_session" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-130" y="690" width="250" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="id : int&lt;br&gt;tms : timestamp&lt;br&gt;elomin : varchar&lt;br&gt;elomax: varchar&lt;br&gt;guild_id: varchar&lt;br&gt;channel_id: varchar&lt;br&gt;message_id: varchar&lt;br&gt;inhouse_status: varchar&lt;br&gt;role_id: varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="5" vertex="1">
-                    <mxGeometry y="20" width="200" height="180" as="geometry"/>
+                <mxCell id="19" value="id : int (pk)&lt;br&gt;step : varchar&lt;br&gt;register_channel : varchar&lt;br&gt;matches_announcement_channel : varchar&lt;br&gt;mvp_vote_channel : varchar&lt;br&gt;mvp_announcement_channel : varchar&lt;br&gt;players_per_role : int&lt;br&gt;elomin : varchar&lt;br&gt;elomax : varchar&lt;br&gt;mvp : varchar&lt;br&gt;participant_role_id : varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="18" vertex="1">
+                    <mxGeometry y="20" width="250" height="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="inhouse_participants" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="400" y="40" width="200" height="200" as="geometry"/>
+                <mxCell id="20" value="inhouse_participant" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="485" width="200" height="210" as="geometry"/>
                 </mxCell>
-                <mxCell id="8" value="discord_id : int&lt;br&gt;inhouse_id : int&lt;br&gt;toplaner_priority : int&lt;br&gt;jungler_priority : int&lt;br&gt;midlaner_priority : int&lt;br&gt;botlaner_priority : int&lt;br&gt;support_priority : int&lt;br&gt;isMvp: int" style="rounded=0;whiteSpace=wrap;html=1;" parent="7" vertex="1">
-                    <mxGeometry y="20" width="200" height="180" as="geometry"/>
+                <mxCell id="21" value="inhouse_id : int (fk, pk)&lt;br&gt;account : varchar (fk, pk)&lt;br&gt;isToplaner : bool&lt;br&gt;isJungler : bool&lt;br&gt;isMidlaner : bool&lt;br&gt;isBotlaner : bool&lt;br&gt;isSupport : bool" style="rounded=0;whiteSpace=wrap;html=1;" parent="20" vertex="1">
+                    <mxGeometry y="20" width="200" height="190" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4" target="8" edge="1">
+                <mxCell id="22" value="" style="endArrow=none;html=1;exitX=1.001;exitY=0.147;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;exitPerimeter=0;" parent="1" source="19" target="21" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="400" y="280" as="sourcePoint"/>
-                        <mxPoint x="450" y="230" as="targetPoint"/>
+                        <mxPoint x="280" y="460" as="sourcePoint"/>
+                        <mxPoint x="330" y="410" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="10" value="" style="endArrow=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="5" target="8" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="400" y="280" as="sourcePoint"/>
-                        <mxPoint x="450" y="230" as="targetPoint"/>
-                    </mxGeometry>
+                <mxCell id="23" value="inhouse_match" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="490" width="200" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="inhouse_teams" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="720" y="40" width="200" height="200" as="geometry"/>
-                </mxCell>
-                <mxCell id="12" value="inhouse_id: int&lt;br&gt;team_id: int&lt;br&gt;team_name: varchar&lt;br&gt;toplaner: varchar&lt;br&gt;jungler: varchar&lt;br&gt;midlaner: varchar&lt;br&gt;botlaner: varchar&lt;br&gt;support: varchar" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="11">
+                <mxCell id="24" value="inhouse_id : int (pk, fk)&lt;br&gt;match_id : int (pk)&lt;br&gt;match_tms : tms&lt;br&gt;is_streamed : int&lt;br&gt;is_finished : int" style="rounded=0;whiteSpace=wrap;html=1;" parent="23" vertex="1">
                     <mxGeometry y="20" width="200" height="180" as="geometry"/>
                 </mxCell>
-                <mxCell id="13" value="" style="endArrow=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="12" target="8">
+                <mxCell id="25" value="inhouse_team" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="620" y="770" width="200" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="inhouse_id : int (pk, fk)&lt;br&gt;team_id : int (pk)&lt;br&gt;match_id : int (pk, fk)&lt;br&gt;toplaner_id : varchar (fk)&lt;br&gt;jungler_id : varchar (fk)&lt;br&gt;midlaner_id : varchar (fk)&lt;br&gt;botlaner_id : varchar (fk)&lt;br&gt;support_id : varchar (fk)&lt;br&gt;name : varchar&lt;br&gt;discord_role_id : varchar" style="rounded=0;whiteSpace=wrap;html=1;" parent="25" vertex="1">
+                    <mxGeometry y="20" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="21" target="24" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="440" y="320" as="sourcePoint"/>
-                        <mxPoint x="490" y="270" as="targetPoint"/>
+                        <mxPoint x="680" y="620" as="sourcePoint"/>
+                        <mxPoint x="730" y="570" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="30" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="20" target="27" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="660" y="740" as="sourcePoint"/>
+                        <mxPoint x="710" y="690" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="31" value="" style="endArrow=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="25" target="23" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="770" y="710" as="sourcePoint"/>
+                        <mxPoint x="820" y="660" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="33" value="" style="endArrow=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="20" target="13" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="480" y="420" as="sourcePoint"/>
+                        <mxPoint x="530" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="inouse_mvp_votes" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="-40" y="400" width="200" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="voter : varchar (pk, fk)&lt;br&gt;inouse_session : int (pk, fk)&lt;br&gt;vote1 : varchar (fk)&lt;br&gt;vote2 : varchar (fk)&lt;br&gt;vote3 : varchar (fk)" style="rounded=0;whiteSpace=wrap;html=1;" parent="36" vertex="1">
+                    <mxGeometry y="20" width="200" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="" style="endArrow=none;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="21" target="36" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="260" y="460" as="sourcePoint"/>
+                        <mxPoint x="310" y="410" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="39" value="" style="endArrow=none;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" parent="1" source="37" target="13" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="260" y="460" as="sourcePoint"/>
+                        <mxPoint x="310" y="410" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="36" target="18" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="170" y="660" as="sourcePoint"/>
+                        <mxPoint x="220" y="610" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
             </root>
