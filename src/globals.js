@@ -33,6 +33,7 @@ export const globals = {
             "I"
         ],
         tier: [
+            "UNRANKED",
             "IRON",
             "BRONZE",
             "SILVER",

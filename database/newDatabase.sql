@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS inhouse_session (
     elomin VARCHAR(20) COMMENT "Rang minimum pour participer à l'InHouse",
     elomax VARCHAR(20) COMMENT "Rang maximum pour participer à l'InHouse",
     participant_role_id VARCHAR(20) COMMENT "Role des participants de l'InHouse",
-    date_start DATE COMMENT "Date de début de l'InHouse",
+    date_start VARCHAR(10) COMMENT "Date de début de l'InHouse",
     register_channel VARCHAR(20) COMMENT "Channel pour les inscriptions",
     match_channel VARCHAR(20) COMMENT "Channel d'annonce des matchs",
     vote_channel VARCHAR(20) COMMENT "Channel de vote du MVP - étape 1",
