@@ -49,7 +49,7 @@ export const deploy = {
             console.log(`Refreshing ${commands.length} applications (/) commands on Arena.`);
 
             // Deleting all commands
-            await rest.put(Routes.applicationGuildCommands(process.env.CLIENTID, process.env.ARENAGUILDID), { body: [] }).catch(console.error);
+            //await rest.put(Routes.applicationGuildCommands(process.env.CLIENTID, process.env.ARENAGUILDID), { body: [] }).catch(console.error);
             
             // Reloading them all
             const data = await rest.put(
@@ -110,7 +110,7 @@ export const deploy = {
             console.log(`Refreshing ${commands.length} applications (/) commands on Community.`);
 
             // Deleting all commands
-            await rest.put(Routes.applicationGuildCommands(process.env.CLIENTID, process.env.COMMUNITYGUILDID), { body: [] }).catch(console.error);
+            //await rest.put(Routes.applicationGuildCommands(process.env.CLIENTID, process.env.COMMUNITYGUILDID), { body: [] }).catch(console.error);
 
             // Reloading them all
             const data = await rest.put(
