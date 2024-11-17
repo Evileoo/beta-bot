@@ -32,7 +32,7 @@ export const button = {
         }
 
         // Update database
-        await db.query(`INSERT INTO account (discord_id, riot_puuid) VALUES ('${interaction.user.id}', '${riotAccount.puuid}')`);
+        await db.query(`INSERT INTO account (discord_id, riot_puuid, is_main) VALUES ('${interaction.user.id}', '${riotAccount.puuid}', 0)`);
 
         await interaction.update({
             content: `Vos comptes ont été liés, vous pouvez remettre votre ancienne image de profil.\nPour voir vos comptes Riot liés au bot, faites la commande \`/compte liste\``,

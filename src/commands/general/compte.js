@@ -43,6 +43,18 @@ export const command = {
             .setRequired(false)
         )
     )
+    .addSubcommand( (subcommand) =>
+        subcommand
+        .setName("principal")
+        .setDescription("Définit votre compte principal pour le bot")
+        .addStringOption( (option) =>
+            option
+            .setName("nom")
+            .setDescription("Nom du compte principal")
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+    )
     , async execute(interaction){
 
         if(interaction.options.getSubcommand() == "ajouter") {
@@ -171,7 +183,7 @@ export const command = {
             const member = (interaction.options.getUser("membre") == undefined) ? interaction.user : interaction.options.getUser("membre");
             
             // Get linked accounts in database
-            const linked = await db.query(`SELECT riot_puuid FROM account WHERE discord_id = '${member.id}'`);
+            const linked = await db.query(`SELECT riot_puuid, is_main FROM account WHERE discord_id = '${member.id}'`);
 
             if(linked.length == 0) {
                 return await interaction.reply({
@@ -190,13 +202,43 @@ export const command = {
             for(let link of linked) {
                 const riotAccount = (await rApi.Account.getByPUUID(link.riot_puuid, Constants.RegionGroups.EUROPE)).response;
 
-                desc += `${riotAccount.gameName}#${riotAccount.tagLine}\n`;
+                desc += (link.is_main == 0) ? `${riotAccount.gameName}#${riotAccount.tagLine}\n` : `${riotAccount.gameName}#${riotAccount.tagLine} - principal\n`;
             }
 
             embed.setDescription(desc);
 
             await interaction.reply({
                 embeds: [embed]
+            });
+
+        } else if(interaction.options.getSubcommand() == "principal") {
+
+            // Get command data
+            const account = interaction.options.getString("nom");
+
+            const exists = await db.query(`SELECT NULL FROM account WHERE riot_puuid = '${account}'`);
+
+            if(exists.length == 0) {
+                if(account == "noLinks") {
+                    return await interaction.reply({
+                        content: `Vous n'avez lié aucun compte Riot à votre compte discord`,
+                        ephemeral: true
+                    });
+                } else {
+                    return await interaction.reply({
+                        content: `Veuillez sélectionner un des comptes parmi la liste`,
+                        ephemeral: true
+                    });
+                }
+            }
+
+            await db.query(`UPDATE account SET is_main = 0 WHERE discord_id = '${interaction.user.id}'`);
+
+            await db.query(`UPDATE account SET is_main = 1 WHERE riot_puuid = '${account}'`);
+
+            return await interaction.reply({
+                content: `Compte principal défini`,
+                ephemeral: true
             });
 
         } else {

@@ -54,7 +54,7 @@ export const event = {
 			let autocomplete;
 
 			if(interaction.commandName == "compte") {
-				if(interaction.options.getSubcommand() == "supprimer") {
+				if(interaction.options.getSubcommand() == "supprimer" || interaction.options.getSubcommand() == "principal") {
 					autocomplete = interaction.client.autocompletes.get("compteListLinks");
 				}
 			} else {

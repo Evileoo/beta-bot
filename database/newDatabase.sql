@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS account;
 CREATE TABLE IF NOT EXISTS account (
     discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant du compte Discord",
     riot_puuid VARCHAR(100) NOT NULL COMMENT "Identifiant du compte Riot",
+    is_main DECIMAL(1,0) NOT NULL COMMENT "Indicateur de compte principal",
     PRIMARY KEY (riot_puuid)
 ) ENGINE=INNODB COMMENT="Compte(s) riot connectés au compte discord d'un membre";
 
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS inhouse_session (
     participant_role_id VARCHAR(20) COMMENT "Role des participants de l'InHouse",
     date_start VARCHAR(10) COMMENT "Date de début de l'InHouse",
     register_channel VARCHAR(20) COMMENT "Channel pour les inscriptions",
+    register_message VARCHAR(20) COMMENT "Message des inscriptions",
     match_channel VARCHAR(20) COMMENT "Channel d'annonce des matchs",
     vote_channel VARCHAR(20) COMMENT "Channel de vote du MVP - étape 1",
     mvp_channel VARCHAR(20) COMMENT "Channel de vote du MVP - étape 2",
