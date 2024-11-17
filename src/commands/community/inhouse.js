@@ -171,7 +171,6 @@ export const command = {
             const panelChannel = interaction.guild.channels.cache.get(inhouse[0].panel_channel);
             const message = await panelChannel.messages.fetch(inhouse[0].panel_message);
             const embed = message.embeds[0];
-            const button = message.components[0].components[0].data;
 
             // Update
             let queryUpdates = "";

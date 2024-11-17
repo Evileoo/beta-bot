@@ -22,11 +22,17 @@ export const button = {
         } else {
             await db.query(`UPDATE inhouse_session SET step = 'Terminé' ORDER BY id DESC LIMIT 1`);
 
-            const inhouse = await db.query(`SELECT panel_channel, panel_message FROM inhouse_session ORDER BY id DESC LIMIT 1`);
+            const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
             const channel = interaction.guild.channels.cache.get(inhouse[0].panel_channel);
             const message = await channel.messages.fetch(inhouse[0].panel_message);
             await message.delete();
+
+            if(inhouse[0].register_message) {
+                const registerChannel = interaction.guild.channels.cache.get(inhouse[0].register_channel);
+                const registerMessage = await registerChannel.messages.fetch(inhouse[0].register_message);
+                await registerMessage.delete();
+            }
 
             await interaction.update({
                 content: `L'InHouse a été clôturé.`,
