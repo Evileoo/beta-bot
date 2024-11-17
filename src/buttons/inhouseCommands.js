@@ -12,7 +12,7 @@ export const button = {
                 });
             case "Inscriptions":
                 return await interaction.reply({
-                    content: `# Liste des commandes pour l'étape *Inscriptions* de l'InHouse\n## \`/inhouse paramétrage\`\nParamètres possibles:\n- \`rolemax\`: Nombre maximum de joueurs par role (mettre 0 si on ne souhaite aucune limite)\n- \`date\`: Date à laquelle se déroulera l'InHouse (l'écrire sous forme JJ/MM/AAAA)\n- \`salon\`: Salon dans lequel sera envoyé le message permettant aux membres de s'inscrire\n- \`elomin\`: Rang minimum requis en *Solo Queue* pour pouvoir participer à l'InHouse\n- \`elomax\`: Rang maximum requis en *Solo Queue* pour pouvoir participer à l'InHouse`,
+                    content: `# Liste des commandes pour l'étape *Inscriptions* de l'InHouse\n## \`/inhouse paramétrage\`\nParamètres possibles:\n- \`rolemax\`: Nombre maximum de joueurs par role (mettre 0 si on ne souhaite aucune limite)\n- \`date\`: Date à laquelle se déroulera l'InHouse (l'écrire sous forme JJ/MM/AAAA)\n- \`salon\`: Salon dans lequel sera envoyé le message permettant aux membres de s'inscrire`,
                     ephemeral: true
                 });
             case "Génération":

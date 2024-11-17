@@ -167,6 +167,21 @@ export const command = {
             // Get InHouse registered data
             const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
+            if(inhouse[0].step != "Création" || inhouse[0].step != "Inscriptions") {
+                return await interaction.reply({
+                    content: `Vous ne pouvez pas modifier le paramétrage de l'InHouse après la fin des inscriptions`,
+                    ephemeral: true
+                });
+            }
+
+            if(inhouse[0].step == "Inscriptions" && (elomin || elomax)) {
+                return await interaction.reply({
+                    content: `Vous ne pouvez pas modifier les rangs requis pour participer après avoir lancé les inscriptions`,
+                    ephemeral: true
+                });
+            }
+
+
             // Fetch panel message embed
             const panelChannel = interaction.guild.channels.cache.get(inhouse[0].panel_channel);
             const message = await panelChannel.messages.fetch(inhouse[0].panel_message);
