@@ -51,7 +51,7 @@ for(let modal of modals){
 
 // Create autocompletes collection
 client.autocompletes = new Collection();
-const autocompletes = (fs.existsSync(`./src/autcompletes`)) ? fs.readdirSync(`./src/autcompletes`).filter(file => file.endsWith(`.js`)) : [];
+const autocompletes = (fs.existsSync(`./src/autocompletes`)) ? fs.readdirSync(`./src/autocompletes`).filter(file => file.endsWith(`.js`)) : [];
 for(let autocomplete of autocompletes){
     const autocompleteFile = await import(`./autocompletes/${autocomplete}`);
     client.autocompletes.set(autocomplete.split(".")[0], autocompleteFile.autocomplete);

@@ -1,5 +1,5 @@
-import { AutocompleteInteraction, Events } from 'discord.js';
-import { globals } from '../globals.js'
+import { Events } from 'discord.js';
+import { globals } from '../globals.js';
 
 export const event = {
     name: Events.InteractionCreate,
@@ -51,9 +51,16 @@ export const event = {
 			}
 		} else if (interaction.isAutocomplete()) {
 
-			const autocomplete = interaction.client.autocompletes.get(interaction.commandName);
+			let autocomplete;
 
-			if(!autocomplete) console.error(`No autocomplete matching ${interaction.commandName} was found.`);
+			if(interaction.commandName == "example") {
+				autocomplete = interaction.client.autocompletes.get("example");
+			} else {
+				console.error(`Error executing ${interaction.customId}`);
+				console.error(`Unkown autocomplete`);
+			}
+
+			if(!autocomplete) console.error(`No autcomplete matching ${selectMenuData[0]} was found.`);
 
 			try {
 				await autocomplete.execute(interaction);
