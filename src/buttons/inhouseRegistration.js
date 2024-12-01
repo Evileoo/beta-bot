@@ -6,10 +6,10 @@ export const button = {
     async execute(interaction, buttonData) {
 
         // Send the embed to the registration channel
-        const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id LIMIT 1`);
+        const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
         const registerChannel = interaction.guild.channels.cache.get(inhouse[0].register_channel);
-        console.log(inhouse);
+
         const dmy = inhouse[0].date_start.split("/");
         const dateTimeDiscord = Math.floor(new Date(dmy[2], dmy[1] - 1, dmy[0]).getTime() / 1000);
 
@@ -27,7 +27,7 @@ export const button = {
         );
 
         const registerButton = new ButtonBuilder()
-        .setCustomId(`inHouseRegister`)
+        .setCustomId(`inhouseRegister`)
         .setLabel(`S'inscrire`)
         .setStyle(ButtonStyle.Success);
 
@@ -93,11 +93,11 @@ export const button = {
         const row = new ActionRowBuilder()
         .addComponents(sessionNextStep, sessionCommands, inhouseStop);
 
-        message.edit({
+        const a = await message.edit({
             embeds: [sessionEmbed],
             components: [row]
         });
 
-        return await interaction.deferUpdate();
+        await interaction.deferUpdate();
     }
 }

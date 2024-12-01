@@ -1,109 +1,87 @@
 import { EmbedBuilder, ActionRowBuilder, ButtonStyle, ButtonBuilder } from 'discord.js';
 import { globals } from "../globals.js";
-import { db } from '../connections/database.js';
 
+export const inhouseRoles = {
+    async message(roles, updateRoles) {
 
-export const defineRoles = {
-    async updateEmbed(interaction, update) {
-        const newPriorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM inhouse_participants WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-
-        let highPriorityMessage = "";
-        let noPriorityMessage = "";
-
-        priorityMessages(newPriorities[0].toplaner_priority, "toplaner");
-        priorityMessages(newPriorities[0].jungler_priority, "jungler");
-        priorityMessages(newPriorities[0].midlaner_priority, "midlaner");
-        priorityMessages(newPriorities[0].botlaner_priority, "AD Carry");
-        priorityMessages(newPriorities[0].support_priority, "support");
-
-        function priorityMessages(priority, role) {
-            if(priority == 0) noPriorityMessage += (noPriorityMessage ? ", ": "") + role;
-            else highPriorityMessage += (highPriorityMessage ? ", ": "") + role;
+        if(!roles) {
+            roles = {
+                top: 0,
+                jgl: 0,
+                mid: 0,
+                bot: 0,
+                sup: 0,
+            };
         }
 
-        // Build the embed
+        let prefered = "";
+        let wanted = "";
+        let unwanted = "";
+
+        priorities(roles.top, "toplaner");
+        priorities(roles.jgl, "jungler");
+        priorities(roles.mid, "midlaner");
+        priorities(roles.bot, "AD carry");
+        priorities(roles.sup, "support");
+
+        function priorities(priority, role) {
+            if(priority == 0) unwanted += (unwanted ? ", ": "") + role;
+            else if(priority == 1) wanted += (wanted ? ", ": "") + role;
+            else prefered = role;
+        }
+
+        // Build the message
         const embed = new EmbedBuilder()
-        .setTitle("Choix du/des roles")
-        .setDescription("Cliquez sur le bouton du role pour le mettre dans les joués ou non joués.\n\nUne fois que les roles sont comme vous le souhaitez vous pouvez rejeter le message.")
+        .setTitle(`Choix des roles voulus`)
+        .setDescription(`Cliquez sur les boutons pour définir les roles qui pourront vous être attribués pendant cet In House.\nUne fois vos choix faits, cliquez sur \`Confirmer\` pour terminer votre inscription\n\nNote: si vous voulez changer votre role prioritaire, enlevez-le puis placez un autre role`)
         .setColor(globals.embed.colorMain)
         .setTimestamp()
         .addFields(
-            { name: `Roles joués`, value: (highPriorityMessage == "") ? " " : highPriorityMessage },
-            { name: `Roles non joués`, value: (noPriorityMessage == "") ? " " : noPriorityMessage },
-        );
+            { name: `Role prioritaire`, value: `${(prefered.length == 0) ? " " : prefered}`, inline: false },
+            { name: `Roles secondaires`, value: `${(wanted.length == 0) ? " " : wanted}`, inline: false },
+            { name: `Roles non joués`, value: `${(unwanted.length == 0) ? " " : unwanted}`, inline: false },
+        )
 
         const bTop = new ButtonBuilder()
-        .setCustomId(`assignRole${globals.separator}toplaner`)
+        .setCustomId(`inhouseRoles${globals.separator}top${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}${globals.separator}${updateRoles}`)
         .setLabel(`Toplaner`)
-        .setStyle(ButtonStyle.Primary);
+        .setStyle((roles.top == 0) ? ButtonStyle.Danger : ((roles.top == 1) ? ButtonStyle.Secondary : ButtonStyle.Primary));
 
         const bJgl = new ButtonBuilder()
-        .setCustomId(`assignRole${globals.separator}jungler`)
+        .setCustomId(`inhouseRoles${globals.separator}jgl${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}${globals.separator}${updateRoles}`)
         .setLabel(`Jungler`)
-        .setStyle(ButtonStyle.Primary);
+        .setStyle((roles.jgl == 0) ? ButtonStyle.Danger : ((roles.jgl == 1) ? ButtonStyle.Secondary : ButtonStyle.Primary));
 
         const bMid = new ButtonBuilder()
-        .setCustomId(`assignRole${globals.separator}midlaner`)
+        .setCustomId(`inhouseRoles${globals.separator}mid${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}${globals.separator}${updateRoles}`)
         .setLabel(`Midlaner`)
-        .setStyle(ButtonStyle.Primary);
+        .setStyle((roles.mid == 0) ? ButtonStyle.Danger : ((roles.mid == 1) ? ButtonStyle.Secondary : ButtonStyle.Primary));
 
-        const bAdc = new ButtonBuilder()
-        .setCustomId(`assignRole${globals.separator}adc`)
+        const bBot = new ButtonBuilder()
+        .setCustomId(`inhouseRoles${globals.separator}bot${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}${globals.separator}${updateRoles}`)
         .setLabel(`AD Carry`)
-        .setStyle(ButtonStyle.Primary);
+        .setStyle((roles.bot == 0) ? ButtonStyle.Danger : ((roles.bot == 1) ? ButtonStyle.Secondary : ButtonStyle.Primary));
 
         const bSup = new ButtonBuilder()
-        .setCustomId(`assignRole${globals.separator}support`)
+        .setCustomId(`inhouseRoles${globals.separator}sup${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}${globals.separator}${updateRoles}`)
         .setLabel(`Support`)
-        .setStyle(ButtonStyle.Primary);
+        .setStyle((roles.sup == 0) ? ButtonStyle.Danger : ((roles.sup == 1) ? ButtonStyle.Secondary : ButtonStyle.Primary));
 
-        const row = new ActionRowBuilder()
-        .addComponents(bTop, bJgl, bMid, bAdc, bSup);
+        const rolesRow = new ActionRowBuilder()
+        .addComponents(bTop, bJgl, bMid, bBot, bSup);
 
-        if(update) {
-            await interaction.update({
-                embeds: [embed],
-                components: [row],
-                ephemeral: true
-            });
-        } else {
-            await interaction.reply({
-                embeds: [embed],
-                components: [row],
-                ephemeral: true
-            });
-        }
-    },
-    async updateRoles(interaction, role) {
-        // Get role priorities
-        const priorities = await db.query(`SELECT toplaner_priority, jungler_priority, midlaner_priority, botlaner_priority, support_priority FROM inhouse_participants WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
+        const rolesConfirm = new ButtonBuilder()
+        .setCustomId(`inhouseRegisterConfirm${globals.separator}${updateRoles}${globals.separator}${roles.top}${roles.jgl}${roles.mid}${roles.bot}${roles.sup}`)
+        .setLabel(`Confirmer les roles`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true);
 
-        switch(role) {
-            case "toplaner":
-                if(priorities[0].toplaner_priority == 0) await db.query(`UPDATE inhouse_participants SET toplaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE inhouse_participants SET toplaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                break;
-            case "jungler":
-                if(priorities[0].jungler_priority == 0) await db.query(`UPDATE inhouse_participants SET jungler_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE inhouse_participants SET jungler_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                break;
-            case "midlaner":
-                if(priorities[0].midlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET midlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE inhouse_participants SET midlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                break;
-            case "adc":
-                if(priorities[0].botlaner_priority == 0) await db.query(`UPDATE inhouse_participants SET botlaner_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE inhouse_participants SET botlaner_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                break;
-            case "support":
-                if(priorities[0].support_priority == 0) await db.query(`UPDATE inhouse_participants SET support_priority = 1 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                else await db.query(`UPDATE inhouse_participants SET support_priority = 0 WHERE discord_id = '${interaction.user.id}' ORDER BY inhouse_id DESC LIMIT 1`);
-                break;
-            default :
-                return await interaction.reply({
-                    content: `Erreur lors de l'assignement du role, merci de prévenir ${globals.developer.discord.globalName}`,
-                    ephemeral: true
-                });
-        }
+        const confirmRow = new ActionRowBuilder()
+        .addComponents(rolesConfirm);
+
+        return {
+            embeds: [embed],
+            components: [rolesRow, confirmRow],
+        };
     }
 }

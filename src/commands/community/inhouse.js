@@ -167,7 +167,7 @@ export const command = {
             // Get InHouse registered data
             const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
-            if(inhouse[0].step != "Création" || inhouse[0].step != "Inscriptions") {
+            if(inhouse[0].step != "Création" && inhouse[0].step != "Inscriptions") {
                 return await interaction.reply({
                     content: `Vous ne pouvez pas modifier le paramétrage de l'InHouse après la fin des inscriptions`,
                     ephemeral: true

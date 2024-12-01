@@ -1,31 +1,35 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, InteractionResponse } from 'discord.js';
 import { globals } from '../globals.js';
+import { lApi } from '../connections/lolapi.js';
+import { Constants } from 'twisted';
 import { db } from '../connections/database.js';
 
 export const button = {
     async execute(interaction, buttonData) {
 
+        const roles = {
+            top: parseInt(buttonData[2].substring(0,1)),
+            jgl: parseInt(buttonData[2].substring(1,2)),
+            mid: parseInt(buttonData[2].substring(2,3)),
+            bot: parseInt(buttonData[2].substring(3,4)),
+            sup: parseInt(buttonData[2].substring(4,5))
+        }
+        
         const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
 
-        //Check if the member is already registered
-        const registered = await db.query(`SELECT * FROM inhouse_participant WHERE discord_id = '${interaction.user.id}' AND inhouse_id = ${inhouse[0].id}`);
+        const dmy = inhouse[0].date_start.split("/");
+        const dateTimeDiscord = Math.floor(new Date(dmy[2], dmy[1] - 1, dmy[0]).getTime() / 1000);
 
-        if(registered.length == 0) {
-            return await interaction.reply({
-                content: `Vous n'êtes pas inscrit à l'inhouse`,
-                ephemeral: true
-            });
+        // Update database
+        if(buttonData[1] == "false") {
+            await db.query(`INSERT INTO inhouse_participant (discord_id, inhouse_id, is_toplaner, is_jungler, is_midlaner, is_botlaner, is_support) VALUES ('${interaction.user.id}', ${inhouse[0].id}, ${roles.top}, ${roles.jgl}, ${roles.mid}, ${roles.bot}, ${roles.sup})`);
+        } else {
+            await db.query(`UPDATE inhouse_participant SET is_toplaner = ${roles.top}, is_jungler = ${roles.jgl}, is_midlaner = ${roles.mid}, is_botlaner = ${roles.bot}, is_support = ${roles.sup} WHERE inhouse_id = ${inhouse[0].id} AND discord_id = '${interaction.user.id}'`);
         }
-
-        // Delete the user from the inhouse
-        await db.query(`DELETE FROM inhouse_participant WHERE inhouse_id = (SELECT id FROM inhouse_session ORDER BY id DESC LIMIT 1) AND discord_id = '${interaction.user.id}'`);
 
         // Get inhouse data
         const participants = await db.query(`SELECT COUNT(*) AS "all" FROM inhouse_participant WHERE inhouse_id = ${inhouse[0].id} AND discord_id = '${interaction.user.id}'`);
         const role = await db.query(`SELECT IFNULL(SUM(IF(is_toplaner > 0, 1, 0)), 0) AS "top", IFNULL(SUM(IF(is_jungler > 0, 1, 0)), 0) AS "jgl", IFNULL(SUM(IF(is_midlaner > 0, 1, 0)), 0) AS "mid", IFNULL(SUM(IF(is_botlaner > 0, 1, 0)), 0) AS "bot", IFNULL(SUM(IF(is_support > 0, 1, 0)), 0) AS "sup" FROM inhouse_participant WHERE inhouse_id = ${inhouse[0].id}`);
-
-        const dmy = inhouse[0].date_start.split("/");
-        const dateTimeDiscord = Math.floor(new Date(dmy[2], dmy[1] - 1, dmy[0]).getTime() / 1000);
 
         // Update session message
         const panelChannel = await interaction.guild.channels.fetch(inhouse[0].panel_channel);
@@ -53,8 +57,8 @@ export const button = {
         );
 
         // update button
-        if(+participants[0].all < 10) {
-            panelButtons.components[0].data.disabled = true;
+        if(+participants[0].all >= 10) {
+            panelButtons.components[0].data.disabled = false;
         }
 
         await panelMessage.edit({
@@ -73,11 +77,41 @@ export const button = {
             embeds: [registrationEmbed]
         });
 
-        // Reply
-        await interaction.reply({
-            content: `Vous avez été désinscrit de l'inhouse`,
+        // Prepare inhouse roles confirmation message
+        let mainRole, secondRoles = "";
+        let mainMessage;
+
+        message(roles.top, "toplaner");
+        message(roles.jgl, "jungler");
+        message(roles.mid, "midlaner");
+        message(roles.bot, "adc");
+        message(roles.sup, "support");
+
+        function message(priority, role) {
+            if(priority == 1) {
+                secondRoles += (secondRoles.length == 0) ? `**${role}**` : `, **${role}**`
+            } else if(priority == 2) {
+                mainRole = `**${role}**`;
+            }
+        }
+
+        mainMessage = `Vous êtes inscrits à l'inhouse en tant que ${mainRole}.`;
+
+        if(secondRoles.length > 0) {
+            mainMessage += `\n`;
+            if(secondRoles.includes(`,`)) {
+                mainMessage += `Les roles ${secondRoles} pourront vous être donnés s'il manque des joueurs à ces postes.`
+            } else {
+                mainMessage += `Le role ${secondRoles} pourra vous être donné s'il manque des joueurs à ce poste`
+            }
+        }
+
+        await interaction.update({
+            content: `${mainMessage}`,
+            embeds: [],
+            components: [],
             ephemeral: true
         });
-        
+
     }
 }

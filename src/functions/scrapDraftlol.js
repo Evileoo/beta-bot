@@ -55,7 +55,7 @@ export const sdl = {
 
         await browser.close();
 
-        console.log(await getChampionByKey(9));
+        (await getChampionByKey(9));
 
         return data;
     }
