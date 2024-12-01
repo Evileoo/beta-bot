@@ -1,4 +1,4 @@
-import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, InteractionResponse } from 'discord.js';
+import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { globals } from '../globals.js';
 import { lApi } from '../connections/lolapi.js';
 import { Constants } from 'twisted';
@@ -34,7 +34,6 @@ export const button = {
         // Update session message
         const panelChannel = await interaction.guild.channels.fetch(inhouse[0].panel_channel);
         const panelMessage = await panelChannel.messages.fetch(inhouse[0].panel_message);
-        const panelButtons = panelMessage.components[0];
 
         // update the embed
         const panelEmbed = new EmbedBuilder()
@@ -56,14 +55,28 @@ export const button = {
             { name: `Sup`, value: `${role[0].sup}`, inline: true },
         );
 
-        // update button
-        if(+participants[0].all >= 10) {
-            panelButtons.components[0].data.disabled = false;
-        }
+        const sessionNextStep = new ButtonBuilder()
+        .setCustomId(`inhouseRegistrationClose`)
+        .setLabel(`Clôturer les inscriptions`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled((+participants[0].all >= 10) ? false : true);
+
+        const sessionCommands = new ButtonBuilder()
+        .setCustomId(`inhouseCommands${globals.separator}Inscriptions`)
+        .setLabel(`Commandes`)
+        .setStyle(ButtonStyle.Secondary);
+
+        const inhouseStop = new ButtonBuilder()
+        .setCustomId(`inhouseStop${globals.separator}first`)
+        .setLabel(`Annuler l'InHouse`)
+        .setStyle(ButtonStyle.Danger);
+
+        const row = new ActionRowBuilder()
+        .addComponents(sessionNextStep, sessionCommands, inhouseStop);
 
         await panelMessage.edit({
             embeds: [panelEmbed],
-            components: [panelButtons]
+            components: [row]
         });
 
         // Update registration message
