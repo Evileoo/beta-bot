@@ -1,8 +1,13 @@
-// JS imports
+// JS imports for discord
 import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import { deploy } from './deploy-commands.js';
+
+// Imports for api
+import express from 'express';
+import bodyParser from 'body-parser';
+
 
 // Create client instance
 const client = new Client({
@@ -134,5 +139,19 @@ client.on('reconnecting', () => {
 await deploy.refreshArena();
 await deploy.refreshCommunity();
 
-// Login
+// Login to discord
 await client.login(process.env.TOKEN);
+
+// Create the api instance
+const app = express();
+app.use(bodyParser.json());
+const port = process.env.PORT || 3000;
+
+// Login to the api
+app.listen(port, () => {
+    console.log(`API connected at port ${port}`);
+});
+
+app.get('/api/hello', (req, res) => {
+    res.json({ message: 'Hello, World!' });
+});
