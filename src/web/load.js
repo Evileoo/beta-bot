@@ -4,12 +4,15 @@ import express from 'express';
 
 export const web = {
     async loadPage(client) {
+
+        const port = process.env.WEB_PORT || 8080;
+
         const app = express();
 
         app.get('/', (request, response) => {
         	return response.sendFile('index.html', { root: './src/web/' });
         });
 
-        app.listen(process.env.WEB_PORT, () => console.log(`App listening at http://localhost:${process.env.WEB_PORT}`));
+        app.listen(port, () => console.log(`Web server connected at port ${port}`));
     }
 };
