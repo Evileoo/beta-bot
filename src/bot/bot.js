@@ -1,13 +1,21 @@
-import { Collection } from 'discord.js';
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import { deploy } from './deploy-commands.js';
 
 export const bot = {
-    async start(client) {
+    async start() {
+
+        // Create the client
+        const client = new Client({
+            intents: [
+                GatewayIntentBits.Guilds
+            ]
+        });
+
         // Create commands collection
         client.commands = new Collection();
-        const commandFoldersPath = path.join("src", "commands");
+        const commandFoldersPath = path.join("src", "bot", "commands");
         const commandFolders = (fs.existsSync(commandFoldersPath)) ? fs.readdirSync(commandFoldersPath) : [];
 
         for(let folder of commandFolders) {
@@ -22,7 +30,7 @@ export const bot = {
 
         // Create user context menus collection
         client.userContextMenus = new Collection();
-        const userContextMenusFoldersPath = path.join("src", "userContextMenus");
+        const userContextMenusFoldersPath = path.join("src", "bot", "userContextMenus");
         const userContextMenusFolders = (fs.existsSync(userContextMenusFoldersPath)) ? fs.readdirSync(userContextMenusFoldersPath) : [];
 
         for(let folder of userContextMenusFolders) {
@@ -37,7 +45,7 @@ export const bot = {
 
         // Create message context menus collection
         client.messageContextMenus = new Collection();
-        const messageContextMenusFoldersPath = path.join("src", "messageContextMenus");
+        const messageContextMenusFoldersPath = path.join("src", "bot", "messageContextMenus");
         const messageContextMenusFolders = (fs.existsSync(messageContextMenusFoldersPath)) ? fs.readdirSync(messageContextMenusFoldersPath) : [];
 
         for(let folder of messageContextMenusFolders) {
@@ -130,5 +138,7 @@ export const bot = {
 
         // Login to discord
         await client.login(process.env.TOKEN);
+
+        return client;
     }
 }
