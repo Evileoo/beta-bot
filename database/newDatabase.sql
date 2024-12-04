@@ -2,6 +2,7 @@
 --  DROP TABLES  --
 -- ----------------
 
+-- inhouse
 DROP TABLE IF EXISTS inhouse_mvp_votes;
 DROP TABLE IF EXISTS inhouse_team;
 DROP TABLE IF EXISTS inhouse_match;
@@ -9,11 +10,15 @@ DROP TABLE IF EXISTS inhouse_participant;
 DROP TABLE IF EXISTS inhouse_session;
 DROP TABLE IF EXISTS account;
 
+-- API
+DROP TABLE IF EXISTS api_key;
+
 
 -- ----------------
 -- CREATE TABLES --
 -- ----------------
 
+-- inhouse
 CREATE TABLE IF NOT EXISTS account (
     discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant du compte Discord",
     riot_puuid VARCHAR(100) NOT NULL COMMENT "Identifiant du compte Riot",
@@ -75,6 +80,16 @@ CREATE TABLE IF NOT EXISTS inhouse_team (
 ) ENGINE=INNODB COMMENT="Team d'InHouse";
 
 CREATE TABLE IF NOT EXISTS inhouse_mvp_votes (
+    discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant discord du votant",
+    inhouse_id INT NOT NULL COMMENT "Identifiant de l'InHouse",
+    vote1 VARCHAR(20) NOT NULL COMMENT "Identifiant discord du premier joueur voté",
+    vote2 VARCHAR(20) COMMENT "Identifiant discord du deuxième joueur voté",
+    vote3 VARCHAR(20) COMMENT "Identifiant discord du troisième joueur voté",
+    PRIMARY KEY (discord_id, inhouse_id)
+) ENGINE=INNODB COMMENT="Team d'InHouse";
+
+-- API
+CREATE TABLE IF NOT EXISTS api_key (
     discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant discord du votant",
     inhouse_id INT NOT NULL COMMENT "Identifiant de l'InHouse",
     vote1 VARCHAR(20) NOT NULL COMMENT "Identifiant discord du premier joueur voté",
