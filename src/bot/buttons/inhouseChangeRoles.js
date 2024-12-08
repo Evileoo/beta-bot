@@ -1,6 +1,6 @@
 import {  } from 'discord.js';
 import { globals } from '../../globals.js';
-import { db } from '../connections/database.js';
+import { db } from '../../connections/database.js';
 import { inhouseRoles } from '../functions/defineRoles.js';
 
 export const button = {

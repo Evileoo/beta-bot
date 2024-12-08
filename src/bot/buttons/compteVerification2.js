@@ -1,8 +1,8 @@
 import { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, IntentsBitField } from 'discord.js';
 import { globals } from '../../globals.js';
-import { rApi, lApi } from '../connections/lolapi.js';
+import { rApi, lApi } from '../../connections/lolapi.js';
 import { Constants } from 'twisted';
-import { db } from '../connections/database.js';
+import { db } from '../../connections/database.js';
 
 export const button = {
     async execute(interaction, buttonData) {

@@ -1,8 +1,8 @@
 import { SlashCommandBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder } from 'discord.js';
 import { globals } from '../../../globals.js';
 import Canvas from '@napi-rs/canvas';
-import { db } from '../../connections/database.js';
-import { lApi } from '../../connections/lolapi.js';
+import { db } from '../../../connections/database.js';
+import { lApi } from '../../../connections/lolapi.js';
 import { Constants } from 'twisted';
 
 export const command = {

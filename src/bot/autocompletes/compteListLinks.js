@@ -1,8 +1,8 @@
 import {  } from 'discord.js';
 import { globals } from '../../globals.js';
 import { Constants } from 'twisted';
-import { db } from '../connections/database.js';
-import { rApi, lApi } from '../connections/lolapi.js';
+import { db } from '../../connections/database.js';
+import { rApi, lApi } from '../../connections/lolapi.js';
 
 export const autocomplete = {
     async execute(interaction){

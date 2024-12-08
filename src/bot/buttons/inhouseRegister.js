@@ -1,7 +1,7 @@
 import {  } from 'discord.js';
 import { globals } from '../../globals.js';
-import { db } from '../connections/database.js';
-import { lApi } from '../connections/lolapi.js';
+import { db } from '../../connections/database.js';
+import { lApi } from '../../connections/lolapi.js';
 import { Constants } from 'twisted';
 import { inhouseRoles } from '../functions/defineRoles.js';
 

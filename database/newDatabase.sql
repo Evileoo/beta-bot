@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS inhouse_session;
 DROP TABLE IF EXISTS account;
 
 -- API
-DROP TABLE IF EXISTS api_key;
+DROP TABLE IF EXISTS api_access;
 
 
 -- ----------------
@@ -89,11 +89,13 @@ CREATE TABLE IF NOT EXISTS inhouse_mvp_votes (
 ) ENGINE=INNODB COMMENT="Team d'InHouse";
 
 -- API
-CREATE TABLE IF NOT EXISTS api_key (
-    discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant discord du votant",
-    inhouse_id INT NOT NULL COMMENT "Identifiant de l'InHouse",
-    vote1 VARCHAR(20) NOT NULL COMMENT "Identifiant discord du premier joueur voté",
-    vote2 VARCHAR(20) COMMENT "Identifiant discord du deuxième joueur voté",
-    vote3 VARCHAR(20) COMMENT "Identifiant discord du troisième joueur voté",
-    PRIMARY KEY (discord_id, inhouse_id)
-) ENGINE=INNODB COMMENT="Team d'InHouse";
+CREATE TABLE IF NOT EXISTS api_access (
+    token_type VARCHAR(20) NOT NULL,
+    access_token VARCHAR(30) NOT NULL,
+    refresh_token VARCHAR(30) NOT NULL,
+    url_code VARCHAR(30) NOT NULL,
+    discord_id VARCHAR(20) NOT NULL COMMENT "Identifiant discord de l'utilisateur",
+    api_key VARCHAR(50) COMMENT "clé d'accès à l'API",
+    api_key_expiration VARCHAR(24) COMMENT "date d'expiration de la clé d'API",
+    PRIMARY KEY (discord_id)
+) ENGINE=INNODB COMMENT="Infos d'accès à l'API";

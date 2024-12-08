@@ -2,8 +2,8 @@ import { SlashCommandBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Act
 import { globals } from '../../../globals.js';
 import { Constants } from 'twisted';
 import Canvas from '@napi-rs/canvas';
-import { db } from '../../connections/database.js';
-import { rApi, lApi } from '../../connections/lolapi.js';
+import { db } from '../../../connections/database.js';
+import { rApi, lApi } from '../../../connections/lolapi.js';
 
 export const command = {
     data: new SlashCommandBuilder()
