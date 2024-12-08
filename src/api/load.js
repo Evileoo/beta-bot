@@ -2,6 +2,7 @@ import {  } from 'discord.js';
 import { globals } from '../globals.js';
 import bodyParser from 'body-parser';
 import express from 'express';
+import { apiGetRoles } from './roles.js';
 
 export const api = {
     async load(client) {
@@ -20,7 +21,7 @@ export const api = {
             if(roles.hasOwnProperty("message")) {
                 return res.json(roles);
             }
-            res.json({ message: `${req.accepted}` });
+            res.json(roles);
         });
     }
 };

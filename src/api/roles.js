@@ -82,9 +82,17 @@ export async function apiGetRoles(client, params) {
         }
     }
 
+    for(let memberId of members) {
+        const member = await server.members.fetch(memberId);
+        const memberRoles = member.roles.cache.map(m => new Object({id: m.id, name: m.name}));
 
-    //console.log(client);
-    //console.log(params);
+        const rolesObject = {
+            member: memberId,
+            roles: memberRoles
+        }
 
-    return 1;
+        roles.push(rolesObject);
+    }
+
+    return roles;
 }
