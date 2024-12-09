@@ -5,9 +5,9 @@ import { db } from '../connections/database.js';
 export async function apiGetRoles(client, params) {
 
     let server;
-    let members = [];
-    let roles = [];
+    const roles = [];
 
+    // Check the api key
     if(!params.hasOwnProperty("key")) {
         return {
             message: `La clé d'API n'a pas été fournie`
@@ -31,23 +31,23 @@ export async function apiGetRoles(client, params) {
         }
     }
 
+    // Check received data
     if(!params.hasOwnProperty("serverID")) {
         return {
             message: `L'identifiant du serveur n'a pas été fourni`
         }
     }
 
-    if(!params.hasOwnProperty("member") && !params.hasOwnProperty("roleID")) {
+    if(!params.hasOwnProperty("members")) {
         return {
-            message: `Ni un membre ni un role n'a été fourni`
+            message: `Aucun membre n'a été fourni`
         }
     }
 
-    if(params.hasOwnProperty("member") && params.hasOwnProperty("roleID")) {
-        return {
-            message: `Il ne faut fournir qu'un membre OU un role`
-        }
-    }
+
+    // Fetch data
+
+    const members = params.members.split(",");
 
     //1156666614561902592
     // get the server
@@ -61,34 +61,32 @@ export async function apiGetRoles(client, params) {
     
     //role: 1156942393950617690 member: 398358008838488077
     // Get members
-    if(params.hasOwnProperty("member")) {
+    for(let m of members) {
+        let member;
+        
+        
         try {
-            const member = await server.members.fetch(params.member);
-            members.push(member.user.id);
+            member = await server.members.fetch(m);
         } catch(error) {
             return {
                 message: `Membre donné inexistant sur le serveur donné`
             }
         }
-    } else {
-        try {
-            const role = await server.roles.fetch(params.roleID);
-            console.log(role.members);
-        } catch(error) {
-            console.error(error);
-            return {
-                message: `Role donné inexistant sur le serveur donné`
-            }
-        }
-    }
 
-    for(let memberId of members) {
-        const member = await server.members.fetch(memberId);
         const memberRoles = member.roles.cache.map(m => new Object({id: m.id, name: m.name}));
 
         const rolesObject = {
-            member: memberId,
-            roles: memberRoles
+            member: m
+        }
+
+        if(params.hasOwnProperty("roles")) {
+            const rolesToCheck = params.roles.split(",");
+            const rolesSet = new Set(rolesToCheck);
+            const hasRoles = memberRoles.filter(value => rolesSet.has(value.id));
+
+            rolesObject.roles = hasRoles;
+        } else {
+            rolesObject.roles = memberRoles;
         }
 
         roles.push(rolesObject);
