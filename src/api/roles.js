@@ -1,10 +1,11 @@
 import {  } from 'discord.js';
 import { globals } from '../globals.js';
 import { db } from '../connections/database.js';
+import { apiKeyCheck } from './keyCheck.js';
 
 export async function apiGetRoles(client, params) {
 
-    let server;
+    let guild;
     const roles = [];
 
     // Check the api key
@@ -14,27 +15,14 @@ export async function apiGetRoles(client, params) {
         }
     }
 
-    const keyCheck = await db.query(`SELECT api_key_expiration FROM api_access WHERE api_key = '${params.key}'`);
+    const keyCheck = await apiKeyCheck(params.key);
 
-    if(keyCheck.length == 0 || keyCheck[0].api_key_expiration == null) {
-        return {
-            message: `Clé d'API fournie incorrecte`
-        }
-    }
-
-    const today = new Date();
-    const expiration = new Date(keyCheck[0].api_key_expiration);
-
-    if(today > expiration) {
-        return {
-            message: `Clé d'API expirée`
-        }
-    }
+    if(keyCheck) return keyCheck;
 
     // Check received data
-    if(!params.hasOwnProperty("serverID")) {
+    if(!params.hasOwnProperty("guildID")) {
         return {
-            message: `L'identifiant du serveur n'a pas été fourni`
+            message: `L'identifiant du guilde n'a pas été fourni`
         }
     }
 
@@ -44,33 +32,32 @@ export async function apiGetRoles(client, params) {
         }
     }
 
-
-    // Fetch data
-
-    const members = params.members.split(",");
+    const membersId = params.members.split(",");
+    const members = [];
 
     //1156666614561902592
-    // get the server
+    // get the guild
     try {
-        server = await client.guilds.fetch(params.serverID);
+        guild = await client.guilds.fetch(params.guildID);
     } catch(error) {
         return {
-            message: `Identifiant de serveur incorrect`
+            message: `Identifiant de guilde incorrect`
+        }
+    }
+
+    // get members
+    for(let memberId of membersId) {
+        try {
+            members.push(await guild.members.fetch(memberId));
+        } catch(error) {
+            return {
+                message: `Membre ${memberId} inexistant dans la guilde donnée`
+            }
         }
     }
     
     //role: 1156942393950617690 member: 398358008838488077
-    for(let m of members) {
-        let member;
-        
-        try {
-            member = await server.members.fetch(m);
-        } catch(error) {
-            return {
-                message: `Membre donné inexistant sur le serveur donné`
-            }
-        }
-
+    for(let member of members) {
         const memberRoles = member.roles.cache.map(m => new Object({id: m.id, name: m.name}));
 
         const rolesObject = {
@@ -95,4 +82,86 @@ export async function apiGetRoles(client, params) {
     }
 
     return roles;
+}
+
+export async function apiSetRoles(client, params) {
+
+    // Check the api key
+    if(!params.hasOwnProperty("key")) {
+        return {
+            message: `La clé d'API n'a pas été fournie`
+        }
+    }
+
+    const keyCheck = await apiKeyCheck(params.key);
+
+    if(keyCheck) return keyCheck;
+
+    // Check received data
+    if(!params.hasOwnProperty("guildID")) {
+        return {
+            message: `L'identifiant du guilde n'a pas été fourni`
+        }
+    }
+
+    if(!params.hasOwnProperty("members")) {
+        return {
+            message: `Aucun membre n'a été fourni`
+        }
+    }
+
+    if(!params.hasOwnProperty("roles")) {
+        return {
+            message: `Aucun role n'a été fourni`
+        }
+    }
+
+    //1156666614561902592
+    // get the guild
+    let guild;
+    try {
+        guild = await client.guilds.fetch(params.guildID);
+    } catch(error) {
+        return {
+            message: `Identifiant de guilde incorrect`
+        }
+    }
+
+    const membersId = params.members.split(",");
+    const rolesId = params.roles.split(",");
+    const members = [];
+
+    for(let memberId of membersId) {
+        try {
+            members.push(await guild.members.fetch(memberId));
+        } catch(error) {
+            return {
+                message: `Membre ${memberId} inexistant sur la guilde donnée`
+            }
+        }
+    }
+
+    //1272492338266243158
+    // get the role
+    for(let roleId of rolesId) {
+
+        let role;
+
+        try {
+            role = await guild.roles.cache.find(r => r.id == roleId);
+        } catch(error) {
+            return {
+                message: `Identifiant de role incorrect`
+            }
+        }
+
+        for(let member of members) {
+            await member.roles.add(roleId);
+        }
+    }
+
+    return {
+        message: "ok"
+    }
+
 }

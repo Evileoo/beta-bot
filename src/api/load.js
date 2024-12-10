@@ -2,7 +2,7 @@ import {  } from 'discord.js';
 import { globals } from '../globals.js';
 import bodyParser from 'body-parser';
 import express from 'express';
-import { apiGetRoles } from './roles.js';
+import { apiGetRoles, apiSetRoles } from './roles.js';
 
 export const api = {
     async load(client) {
@@ -17,6 +17,15 @@ export const api = {
 
         app.get('/api/getRoles', async (req, res) => {
             const roles = await apiGetRoles(client, req.query);
+        
+            if(roles.hasOwnProperty("message")) {
+                return res.json(roles);
+            }
+            res.json(roles);
+        });
+
+        app.get('/api/setRoles', async (req, res) => {
+            const roles = await apiSetRoles(client, req.query);
         
             if(roles.hasOwnProperty("message")) {
                 return res.json(roles);
