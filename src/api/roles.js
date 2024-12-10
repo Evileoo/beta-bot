@@ -11,7 +11,10 @@ export async function apiGetRoles(client, params) {
     // Check the api key
     if(!params.hasOwnProperty("key")) {
         return {
-            message: `La clé d'API n'a pas été fournie`
+            status: "error",
+            code: "001",
+            message: `La clé d'API n'a pas été fournie`,
+            value: []
         }
     }
 
@@ -22,13 +25,19 @@ export async function apiGetRoles(client, params) {
     // Check received data
     if(!params.hasOwnProperty("guildID")) {
         return {
-            message: `L'identifiant du guilde n'a pas été fourni`
+            status: "error",
+            code: "010",
+            message: `L'identifiant de guilde n'a pas été fourni`,
+            value: []
         }
     }
 
     if(!params.hasOwnProperty("members")) {
         return {
-            message: `Aucun membre n'a été fourni`
+            status: "error",
+            code: "020",
+            message: `Aucun membre fourni`,
+            value: []
         }
     }
 
@@ -41,7 +50,10 @@ export async function apiGetRoles(client, params) {
         guild = await client.guilds.fetch(params.guildID);
     } catch(error) {
         return {
-            message: `Identifiant de guilde incorrect`
+            status: "error",
+            code: "011",
+            message: `L'identifiant de guilde est incorrect`,
+            value: []
         }
     }
 
@@ -51,7 +63,10 @@ export async function apiGetRoles(client, params) {
             members.push(await guild.members.fetch(memberId));
         } catch(error) {
             return {
-                message: `Membre ${memberId} inexistant dans la guilde donnée`
+                status: "error",
+                code: "021",
+                message: `L'identifiant ${memberId} ne correspond à aucun membre dans la guilde`,
+                value: []
             }
         }
     }
@@ -81,7 +96,12 @@ export async function apiGetRoles(client, params) {
         roles.push(rolesObject);
     }
 
-    return roles;
+    return {
+        status: "success",
+        code: "000",
+        message: `Ok`,
+        value: roles
+    }
 }
 
 export async function apiSetRoles(client, params) {

@@ -7,7 +7,10 @@ export async function apiKeyCheck(key) {
 
     if(keyCheck.length == 0 || keyCheck[0].api_key_expiration == null) {
         return {
-            message: `Clé d'API fournie incorrecte`
+            status: "error",
+            code: "002",
+            message: `La clé d'API est incorrecte`,
+            value: []
         }
     }
 
@@ -16,7 +19,10 @@ export async function apiKeyCheck(key) {
 
     if(today > expiration) {
         return {
-            message: `Clé d'API expirée`
+            status: "error",
+            code: "003",
+            message: `La clé d'API est expirée`,
+            value: []
         }
     }
 }
