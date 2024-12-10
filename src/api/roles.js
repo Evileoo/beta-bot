@@ -60,10 +60,8 @@ export async function apiGetRoles(client, params) {
     }
     
     //role: 1156942393950617690 member: 398358008838488077
-    // Get members
     for(let m of members) {
         let member;
-        
         
         try {
             member = await server.members.fetch(m);
@@ -76,7 +74,11 @@ export async function apiGetRoles(client, params) {
         const memberRoles = member.roles.cache.map(m => new Object({id: m.id, name: m.name}));
 
         const rolesObject = {
-            member: m
+            member: {
+                id: member.id,
+                username: member.user.username,
+                globalName: member.user.globalName
+            }
         }
 
         if(params.hasOwnProperty("roles")) {
