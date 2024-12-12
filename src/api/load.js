@@ -17,10 +17,6 @@ export const api = {
 
         app.get('/api/getRoles', async (req, res) => {
             const roles = await apiGetRoles(client, req.query);
-        
-            if(roles.hasOwnProperty("message")) {
-                return res.json(roles);
-            }
             res.json(roles);
         });
 
