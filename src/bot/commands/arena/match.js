@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, GuildScheduledEventManager, GuildScheduledEventPrivacyLevel, GuildScheduledEventEntityType, ChannelType, AttachmentBuilder } from 'discord.js';
 import { globals } from '../../../globals.js';
-import { sdl } from '../../functions/scrapDraftlol.js';
+//import { sdl } from '../../functions/scrapDraftlol.js';
 import puppeteer from 'puppeteer';
 
 export const command = {

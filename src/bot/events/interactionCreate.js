@@ -55,6 +55,8 @@ export const event = {
 				if(interaction.options.getSubcommand() == "supprimer" || interaction.options.getSubcommand() == "principal") {
 					autocomplete = interaction.client.autocompletes.get("compteListLinks");
 				}
+			} else if(interaction.commandName == "draftlol") {
+				autocomplete = interaction.client.autocompletes.get("lolChamps");
 			} else {
 				console.error(`Error executing ${interaction.customId}`);
 				console.error(`Unkown autocomplete`);
