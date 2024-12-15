@@ -185,7 +185,7 @@ export const command = {
 
             const channel = interaction.guild.channels.cache.get(interaction.channelId);
 
-            const canvas = await generateCanvas(fetched);
+            const canvas = await sdl.generateCanvas(fetched);
 
             const image = new AttachmentBuilder(await canvas.encode("png"), {
                 name: "image.png"
@@ -200,73 +200,6 @@ export const command = {
                 content: "Le lien draftlol fourni est incorrect",
                 ephemeral: true
             });
-        }
-
-        
-        async function generateCanvas(data) {
-            // Generate canvas and context
-            const canvas = Canvas.createCanvas(5000, 1500);
-            const ctx = canvas.getContext("2d");
-
-            // Create canvas background
-            ctx.fillStyle = "#111111";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            let marginLeft = 0;
-            let marginRight = canvas.width - 1280/3;
-            let counter = 0;
-
-            for(let champion of data.bluePicks) {
-                
-                if(counter == 3) marginLeft += 100;
-                counter++;
-
-                if(champion == undefined) {
-                    marginLeft += 1280/3 + 5;
-                } else {
-                    const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
-                    const selectedChamp = await Canvas.loadImage(url);
-
-                    ctx.drawImage(
-                        selectedChamp, // image
-                        selectedChamp.width/3, 0, // W/H crop start
-                        selectedChamp.width/3, selectedChamp.height - selectedChamp.height/8, // W/H area of crop
-                        marginLeft, canvas.height - (selectedChamp.height - selectedChamp.height/8), // place in canvas
-                        selectedChamp.width/3, selectedChamp.height - selectedChamp.height/8 // W/H scale
-                    );
-
-                    marginLeft += selectedChamp.width/3 + 5;
-                }
-            }
-
-
-            counter = 0;
-            for(let champion of data.redPicks) {
-                
-                if(counter == 3) marginRight -= 100;
-                counter++;
-
-                if(champion == undefined) {
-                    marginRight -= 1280/3 + 5;
-                } else {
-                    const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
-                    const selectedChamp = await Canvas.loadImage(url);
-
-                    ctx.drawImage(
-                        selectedChamp, // image
-                        selectedChamp.width/3, 0, // W/H crop start
-                        selectedChamp.width/3, selectedChamp.height - selectedChamp.height/8, // W/H area of crop
-                        marginRight, canvas.height - (selectedChamp.height - selectedChamp.height/8), // place in canvas
-                        selectedChamp.width/3, selectedChamp.height - selectedChamp.height/8 // W/H scale
-                    );
-
-                    marginRight -= selectedChamp.width/3 + 5;
-                }
-            }
-
-            
-
-            return canvas;
         }
     }
 }

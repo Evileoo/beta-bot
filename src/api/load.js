@@ -8,7 +8,7 @@ export const api = {
     async load(client) {
         const app = express();
         app.use(bodyParser.json());
-        const port = process.env.API_PORT || 3000;
+        const port = process.env.API_PORT || 4000;
 
         // Login to the api
         app.listen(port, () => {

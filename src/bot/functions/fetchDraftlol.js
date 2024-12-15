@@ -1,4 +1,5 @@
 import axios from "axios";
+import Canvas from '@napi-rs/canvas';
 
 let champsJson;
 export const sdl = {
@@ -65,6 +66,10 @@ export const sdl = {
         }
 
         const returnObject = {
+            teamName: {
+                blue: result.data.roomState.blueName,
+                red: result.data.roomState.redName
+            },
             bluePicks: [],
             redPicks: [],
             blueBans: [],
@@ -87,6 +92,161 @@ export const sdl = {
 
         return returnObject;
 
+    },
+    async generateCanvas(data) {
+        // Consts and vars
+        const canW = 5000, canH = 1500;
+        const splashW = 1280, splashH = 720;
+
+        const pickCropStartW = splashW / 3, pickCropStartH = 0;
+        const pickCropAreaW = splashW / 3, pickCropAreaH = splashH * 0.8;
+        const pickMarginTop = canH - pickCropAreaH;
+        const pickScaleW = pickCropAreaW, pickScaleH = pickCropAreaH;
+        let pickMarginLeft = 0, pickMarginRight = canW - pickScaleW;
+        const picksBreak = canW / 50, picksSeparator = canW / 1000 + pickScaleW;
+
+        const banCropStartW = splashW / 3, banCropStartH = 0;
+        const banCropAreaW = splashW / 3, banCropAreaH = splashW / 3;
+        const banMarginTop = canH - pickCropAreaH - banCropAreaH - canH / 100;
+        const banScaleW = banCropAreaW / 1.5, banScaleH = banCropAreaH / 1.5;
+        let banMarginLeft = 0, banMarginRight = canW - banScaleW;
+        const banBreak = canW / 50, bansSeparator = canW / 900 + banScaleW;
+        
+        let counter;
+        const emptySplashHex = "#000000";
+
+        // Generate canvas and context
+        const canvas = Canvas.createCanvas(canW, canH);
+        const ctx = canvas.getContext("2d");
+
+        // Create canvas background
+        ctx.fillStyle = "#2f3136";
+        ctx.fillRect(0, 0, canW, canH);
+
+        // Add team names
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "200px sans-serif";
+        ctx.fillText(
+            data.teamName.blue, 
+            0, 
+            ctx.measureText(data.teamName.blue).emHeightAscent
+        );
+        ctx.fillText(
+            data.teamName.red, 
+            canW - ctx.measureText(data.teamName.red).width, 
+            ctx.measureText(data.teamName.red).emHeightAscent
+        );
+
+        // Add blue picks LoL splashs in canvas
+        counter = 0;
+        for(let champion of data.bluePicks) {
+            if(counter == 3) {
+                pickMarginLeft += picksBreak;
+            }
+            counter++;
+
+            if(champion != undefined) {
+                const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
+                const selectedChamp = await Canvas.loadImage(url);
+
+                ctx.drawImage(
+                    selectedChamp, // image
+                    pickCropStartW, pickCropStartH, // W/H crop start
+                    pickCropAreaW, pickCropAreaH, // W/H area of crop
+                    pickMarginLeft, pickMarginTop, // place in canvas
+                    pickScaleW, pickScaleH // W/H scale
+                );
+            } else {
+                ctx.fillStyle = emptySplashHex
+                ctx.fillRect(pickMarginLeft, pickMarginTop, pickCropAreaW, pickCropAreaH);
+            }
+
+            pickMarginLeft += picksSeparator;
+        }
+
+        // Add red picks LoL splashs in canvas
+        counter = 0;
+        for(let champion of data.redPicks) {
+            if(counter == 3) {
+                pickMarginRight -= picksBreak;
+            }
+            counter++;
+
+            if(champion != undefined) {
+                const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
+                const selectedChamp = await Canvas.loadImage(url);
+
+                ctx.drawImage(
+                    selectedChamp, // image
+                    pickCropStartW, pickCropStartH, // W/H crop start
+                    pickCropAreaW, pickCropAreaH, // W/H area of crop
+                    pickMarginRight, pickMarginTop, // place in canvas
+                    pickScaleW, pickScaleH // W/H scale
+                );
+            } else {
+                ctx.fillStyle = emptySplashHex
+                ctx.fillRect(pickMarginRight, pickMarginTop, pickCropAreaW, pickCropAreaH);
+            }
+
+            pickMarginRight -= picksSeparator;
+        }
+
+        // Add blue bans LoL splashs in canvas
+        counter = 0;
+        for(let champion of data.blueBans) {
+            if(counter == 3) {
+                banMarginLeft += banBreak;
+            }
+            counter++;
+
+            if(champion != undefined) {
+                const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
+                const selectedChamp = await Canvas.loadImage(url);
+
+                ctx.drawImage(
+                    selectedChamp, // image
+                    banCropStartW, banCropStartH, // W/H crop start
+                    banCropAreaW, banCropAreaH, // W/H area of crop
+                    banMarginLeft, banMarginTop, // place in canvas
+                    banScaleW, banScaleH // W/H scale
+                );
+            } else {
+                ctx.fillStyle = emptySplashHex
+                ctx.fillRect(banMarginLeft, banMarginTop, banScaleW, banScaleH);
+            }
+
+            banMarginLeft += bansSeparator;
+        }
+
+        // Add red bans LoL splashs in canvas
+        counter = 0;
+        for(let champion of data.redBans) {
+            if(counter == 3) {
+                banMarginRight -= banBreak;
+            }
+            counter++;
+
+            if(champion != undefined) {
+                const url = `https://cdn.communitydragon.org/latest/champion/${champion.key}/splash-art/centered/skin/0`
+                const selectedChamp = await Canvas.loadImage(url);
+
+                ctx.drawImage(
+                    selectedChamp, // image
+                    banCropStartW, banCropStartH, // W/H crop start
+                    banCropAreaW, banCropAreaH, // W/H area of crop
+                    banMarginRight, banMarginTop, // place in canvas
+                    banScaleW, banScaleH // W/H scale
+                );
+            } else {
+                ctx.fillStyle = emptySplashHex
+                ctx.fillRect(banMarginRight, banMarginTop, banScaleW, banScaleH);
+            }
+
+            banMarginRight -= bansSeparator;
+        }
+
+
+        return canvas;
     }
 }// https://draftlol.dawe.gg/NvxBNpz7
 //https://cdn.communitydragon.org/latest/champion/${c}/splash-art/centered/skin/0
