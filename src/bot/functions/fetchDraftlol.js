@@ -61,8 +61,16 @@ export const sdl = {
         // Fetch draftlol
         const result = await axios(config);
 
+        if(result.data.roomState.state != "finished") {
+            return {
+                errorMessage: "La draft n'est pas terminée"
+            };
+        }
+
         if(result.status != 200) {
-            return;
+            return {
+                errorMessage: "Le lien de draft fournni est incorrect"
+            };
         }
 
         const returnObject = {
@@ -249,4 +257,3 @@ export const sdl = {
         return canvas;
     }
 }// https://draftlol.dawe.gg/NvxBNpz7
-//https://cdn.communitydragon.org/latest/champion/${c}/splash-art/centered/skin/0

@@ -176,7 +176,7 @@ export const command = {
 
         const fetched = await sdl.getDraft(link, pwd, replacements);
 
-        if(fetched) {
+        if(!fetched.hasOwnProperty("errorMessage")) {
 
             await interaction.reply({
                 content: "chargement de la draft",
@@ -197,7 +197,7 @@ export const command = {
             });
         } else {
             return await interaction.reply({
-                content: "Le lien draftlol fourni est incorrect",
+                content: `${fetched.errorMessage}`,
                 ephemeral: true
             });
         }
