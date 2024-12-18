@@ -31,8 +31,17 @@ export const button = {
             });
         }
 
+        // Check if the user has an account
+        const exists = await db.query(`SELECT * FROM account WHERE discord_id = '${interaction.user.id}'`);
+
         // Update database
-        await db.query(`INSERT INTO account (discord_id, riot_puuid, is_main) VALUES ('${interaction.user.id}', '${riotAccount.puuid}', 0)`);
+        if(exists.length > 0) {
+            await db.query(`INSERT INTO account (discord_id, riot_puuid, is_main) VALUES ('${interaction.user.id}', '${riotAccount.puuid}', 0)`);
+        } else {
+            await db.query(`INSERT INTO account (discord_id, riot_puuid, is_main) VALUES ('${interaction.user.id}', '${riotAccount.puuid}', 1)`);
+        }
+
+        
 
         await interaction.update({
             content: `Vos comptes ont été liés, vous pouvez remettre votre ancienne image de profil.\nPour voir vos comptes Riot liés au bot, faites la commande \`/compte liste\``,

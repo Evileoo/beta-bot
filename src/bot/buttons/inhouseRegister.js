@@ -23,7 +23,7 @@ export const button = {
 
         if(account.length == 0) {
             return await interaction.reply({
-                content: `Vous n'avez pas défini de compte principal`,
+                content: `Vous n'avez pas lié de compte LoL.`,
                 ephemeral: true
             });
         }

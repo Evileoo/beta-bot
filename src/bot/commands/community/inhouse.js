@@ -82,6 +82,47 @@ export const command = {
             .setRequired(false)
         )
     )
+    .addSubcommand( subcommand => 
+        subcommand
+        .setName("match")
+        .setDescription("crée un match d'inhouse")
+        .addStringOption( option =>
+            option
+            .setName("équipe1")
+            .setDescription("Identifiants des 5 joueurs de l'équipe 1")
+            .setRequired(true)
+        )
+        .addStringOption( option =>
+            option
+            .setName("équipe2")
+            .setDescription("Identifiants des 5 joueurs de l'équipe 2")
+            .setRequired(true)
+        )
+        .addIntegerOption( option =>
+            option
+            .setName("ordre")
+            .setDescription("Si le match se joue en 1er ou 5ème")
+            .setRequired(true)
+        )
+        .addStringOption( option =>
+            option
+            .setName("noméquipe1")
+            .setDescription("Nom de l'équipe 1")
+            .setRequired(false)
+        )
+        .addStringOption( option =>
+            option
+            .setName("noméquipe2")
+            .setDescription("Nom de l'équipe 2")
+            .setRequired(false)
+        )
+        .addBooleanOption( option =>
+            option
+            .setName("streamé")
+            .setDescription("Est-ce que le match est streamé ?")
+            .setRequired(false)
+        )
+    )
     
     , async execute(interaction) {
         if(interaction.options.getSubcommand() == "session") {
@@ -235,6 +276,102 @@ export const command = {
                 ephemeral: true
             });
         
+        } else if(interaction.options.getSubcommand() == "match") {
+
+            // Get data
+            const team1 = interaction.options.getString("équipe1").split(",");
+            const team2 = interaction.options.getString("équipe2").split(",");
+            const order = interaction.options.getInteger("ordre");
+            const team1Name = interaction.options.getString("noméquipe1");
+            const team2Name = interaction.options.getString("noméquipe2");
+            const streamed = interaction.options.getBoolean("streamé");
+
+            // If teams are not of the same size
+            if(team1.length != team2.length) {
+                return await interaction.reply({
+                    content: `Un match ne peut pas être joué à ${team1.length} contre ${team2.length}`,
+                    ephemeral: true
+                });
+            }
+
+            const inhouse = await db.query(`SELECT * FROM inhouse_session ORDER BY id DESC LIMIT 1`);
+
+            // Checks
+            for(let i = 0; i < team1.length; i++) {
+                // team 1 member ID is unkown
+                try {
+                    const t1Member = await interaction.guild.members.fetch(team1[i]);
+                } catch(error) {
+                    return await interaction.reply({
+                        content: `l'identifiant n°${i+1} fourni de la team 1 n'est pas bon`,
+                        ephemeral: true
+                    });
+                }
+                // team 2 member ID is unnkown
+                try {
+                    const t2Member = await interaction.guild.members.fetch(team2[i]);
+                } catch(error) {
+                    return await interaction.reply({
+                        content: `l'identifiant n°${i+1} fourni de la team 2 n'est pas bon`,
+                        ephemeral: true
+                    });
+                }
+                // member appears in both teams
+                if(team2.includes(team1[i])) {
+                    return await interaction.reply({
+                        content: `<@${team1[i]}> est dans les deux équipes`,
+                        ephemeral: true
+                    });
+                }
+                // member appears multiple times in the same team
+                if(team1.filter((id) => (id == team1[i])).length > 1) {
+                    return await interaction.reply({
+                        content: `<@${team1[i]}> apparaît plusieurs fois dans l'équipe 1`,
+                        ephemeral: true
+                    });
+                }
+                if(team2.filter((id) => (id == team2[i])).length > 1) {
+                    return await interaction.reply({
+                        content: `<@${team2[i]}> apparaît plusieurs fois dans l'équipe 2`,
+                        ephemeral: true
+                    });
+                }
+            }
+
+            await db.query(`INSERT INTO inhouse_match (inhouse_id, is_streamed, is_finished) VALUES (${inhouse[0].id}, ${(streamed) ? 1 : 0}, 0)`);
+
+            const match = await db.query(`SELECT * FROM inhouse_match ORDER BY match_id DESC LIMIT 1`);
+
+            await db.query(`
+                INSERT INTO (match_id, inhouse_id, toplaner, jungler, midlaner, botlaner, support, team_name) VALUES 
+                (${match[0].match_id}, ${inhouse[0].id}, ${team1[0]}, ${team1[1]}, ${team1[2]}, ${team1[3]}, ${team1[4]}, '${(team1Name) ? team1Name : "Équipe 1"}'), 
+                (${match[0].match_id}, ${inhouse[0].id}, ${team2[0]}, ${team2[1]}, ${team2[2]}, ${team2[3]}, ${team2[4]}, '${(team2Name) ? team2Name : "Équipe 2"}')
+            `);
+
+            const embed = new EmbedBuilder()
+            .setTitle(`Match n°${order}`)
+            .setColor(globals.embed.colorMain)
+            .setFields(
+                { name: `${(team1Name) ? team1Name : "Équipe 1"}`, value: `<@${team1[0]}>\n<@${team1[1]}>\n<@${team1[2]}>\n<@${team1[3]}>\n<@${team1[4]}>`, inline: true },
+                { name: `${(team2Name) ? team2Name : "Équipe 2"}`, value: `<@${team2[0]}>\n<@${team2[1]}>\n<@${team2[2]}>\n<@${team2[3]}>\n<@${team2[4]}>`, inline: true },
+            )
+            .setTimestamp();
+
+            const cancel = new ButtonBuilder()
+            .setCustomId(`inhouseTeamCancel${globals.separator}${match[0].match_id}`)
+            .setLabel(`Supprimer l'équipe`)
+            .setStyle(ButtonStyle.Danger);
+            
+            const row = new ActionRowBuilder()
+            .addComponents(cancel);
+
+            return await interaction.reply({
+                embeds: [embed],
+                components: [row],
+                ephemeral: true
+            });
+
+
         } else {
             return await interaction.reply({
                 content: `Commande non gérée, merci de contacter ${globals.developer.discord.globalName} et de donner la commande que vous avez essayé`,

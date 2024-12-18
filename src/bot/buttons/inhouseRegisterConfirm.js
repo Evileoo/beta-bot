@@ -59,7 +59,7 @@ export const button = {
         .setCustomId(`inhouseRegistrationClose`)
         .setLabel(`Clôturer les inscriptions`)
         .setStyle(ButtonStyle.Success)
-        .setDisabled((+participants[0].all >= 10) ? false : true);
+        //.setDisabled((+participants[0].all >= 10) ? false : true);
 
         const sessionCommands = new ButtonBuilder()
         .setCustomId(`inhouseCommands${globals.separator}Inscriptions`)

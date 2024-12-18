@@ -15,7 +15,7 @@ export const button = {
 
         const registrationEmbed = new EmbedBuilder()
         .setTitle(`Inscriptions In House`)
-        .setDescription(`Pour vous inscrire à l'inhouse, il faut que vous ayez au préalable lié un compte Riot au bot via la commande \`/compte ajouter\`.\nRenseignez tous les comptes sur lesquels vous êtes susceptibles de jouer puis, faites la commande \`/compte principal\` pour définir votre compte principal.\nVeuillez ensuite cliquer sur **s'inscrire** et choisissez vos roles pour l'InHouse.`)
+        .setDescription(`Pour vous inscrire à l'inhouse, il faut que vous ayez au préalable lié un compte Riot au bot via la commande \`/compte ajouter\`.\nRenseignez tous les comptes sur lesquels vous êtes susceptibles de jouer puis.\nFaites la commande \`/compte principal\` si vous avez renseigné plusieurs comptes.\nVeuillez ensuite cliquer sur **s'inscrire** et choisissez vos roles pour l'InHouse.`)
         .setTimestamp()
         .setColor(globals.embed.colorMain)
         .addFields(
@@ -93,7 +93,7 @@ export const button = {
         const row = new ActionRowBuilder()
         .addComponents(sessionNextStep, sessionCommands, inhouseStop);
 
-        const a = await message.edit({
+        await message.edit({
             embeds: [sessionEmbed],
             components: [row]
         });

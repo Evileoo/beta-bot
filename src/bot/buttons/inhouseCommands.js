@@ -12,12 +12,22 @@ export const button = {
                 });
             case "Inscriptions":
                 return await interaction.reply({
-                    content: `Aucune commande n'est disponible à cette étape.\nVeuillez attendre que 10 joueurs soient inscrits pour pouvoir clôturer les inscriptions et passer à la suite`,
+                    content: `Aucune commande n'est disponible à cette étape.\nVeuillez attendre que 10 joueurs soient inscrits pour pouvoir clôturer les inscriptions et passer à la suite.`,
                     ephemeral: true
                 });
             case "Génération":
                 return await interaction.reply({
-                    content: `# Liste des commandes pour l'étape *Génération* de l'InHouse\n`,
+                    content: `
+                        # Liste des commandes pour l'étape *Génération* de l'InHouse\n
+                        ## \`/inhouse match\`\n
+                        Paramètres possibles:\n
+                        - \`équipe1\`: Identifiants discord des joueurs de l'équipe séparés par une virgule (dans l'ordre des roles)\n
+                        - \`équipe2\`: Identifiants discord des joueurs de l'équipe séparés par une virgule (dans l'ordre des roles)\n
+                        - \`noméquipe1\`: Nom de l'équipe 1\n
+                        - \`noméquipe2\`: Nom de l'équipe 2\n
+                        - \`ordre\`: Quand est-ce que le match va être joué par rapport aux autres ? en 1er ? 2e ? (Si plusieurs matchs ont le meme ordre, cela veut dire qu'ils seront joués en même temps)\n
+                        - \`streamé\`: Indique si le match va être streamé\n
+                    `,
                     ephemeral: true
                 });
             case "Résultats":

@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS inhouse_participant (
 
 CREATE TABLE IF NOT EXISTS inhouse_match (
     inhouse_id INT NOT NULL COMMENT "Identifiant de l'InHouse",
-    match_id INT NOT NULL COMMENT "Identifiant du match",
+    match_id INT NOT NULL AUTO_INCREMENT COMMENT "Identifiant du match",
     match_tms TIMESTAMP COMMENT "Date et heure du match",
     is_streamed DECIMAL(1,0) COMMENT "Match streamé",
     is_finished DECIMAL(1,0) COMMENT "Match terminé",
