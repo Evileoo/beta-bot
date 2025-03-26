@@ -21,11 +21,11 @@ export const event = {
 			}
 		} else if (interaction.isButton()) {
 
-			const buttonData = interaction.customId.split(globals.separator);
-
+			const buttonData = interaction.customId.split(`|||`);
+			
 			const button = interaction.client.buttons.get(buttonData[0]);
 
-			if(!button) console.error(`No button matching ${interaction.buttonData[0]} was found.`);
+			if(!button) console.error(`No button matching ${interaction.commandName} was found.`);
 
 			try {
 				await button.execute(interaction, buttonData);
@@ -33,41 +33,30 @@ export const event = {
 				console.error(`Error executing ${interaction.customId}`);
 				console.error(error);
 			}
+
 		} else if (interaction.isStringSelectMenu()) {
 
 			console.log(interaction);
 
-			const selectMenuData = interaction.customId.split(globals.separator);
-
-			const selectMenu = interaction.client.selectMenus.get(selectMenuData[0]);
-
-			if(!selectMenu) console.error(`No select menu matching ${selectMenuData[0]} was found.`);
-
-			try {
-				await selectMenu.execute(interaction, selectMenuData);
-			} catch(error) {
-				console.error(`Error executing ${interaction.customId}`);
-				console.error(error);
-			}
 		} else if (interaction.isAutocomplete()) {
 
 			let autocomplete;
-
-			if(interaction.commandName == "example") {
-				autocomplete = interaction.client.autocompletes.get("example");
+			if(interaction.options._subcommand == 'remove'){
+				autocomplete = interaction.client.autocomplete.get(`dbLeagueSearch`);
+			} else if(interaction.options._subcommand == 'create' || interaction.options._subcommand == 'add' || interaction.commandName == 'stats' || interaction.commandName == 'rankings'){
+				autocomplete = interaction.client.autocomplete.get(`apiLeagueSearch`);
 			} else {
-				console.error(`Error executing ${interaction.customId}`);
-				console.error(`Unkown autocomplete`);
+				console.error(`No autocomplete matching ${interaction.commandName} / ${interaction.options._subcommand} was found.`);
+				return;
 			}
-
-			if(!autocomplete) console.error(`No autcomplete matching ${selectMenuData[0]} was found.`);
 
 			try {
 				await autocomplete.execute(interaction);
 			} catch(error) {
-				console.error(`Error executing ${interaction.customId}`);
+				console.error(`Error executing ${interaction.options._subcommand}`);
 				console.error(error);
 			}
+			
 		} else if(interaction.isModalSubmit()) {
 
 			const modalData = interaction.customId.split(globals.separator);
