@@ -32,7 +32,7 @@ async function refresh(){
         console.log(`Refreshing ${commands.length} applications (/) commands.`);
 
         const data = await rest.put(
-            Routes.applicationGuildCommands(process.env.CLIENTID, process.env.COMMUNITYGUILDID),
+            Routes.applicationCommands(process.env.CLIENTID),
             { body: commands }
         );
 
