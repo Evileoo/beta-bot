@@ -1,5 +1,6 @@
 project:
     new:
         [ ] add a button at the end of the routine. Pressing it will show all pending predictions of the user
+        [ ] limit of predictions channel per server
     refacto:
         [ ] routine 
